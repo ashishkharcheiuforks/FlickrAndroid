@@ -35,7 +35,7 @@ class FlickrModule {
             .create(FlickrApi::class.java)
 
     private fun OkHttpClient.Builder.addLoggingIntercept(
-            level: HttpLoggingInterceptor.Level = HttpLoggingInterceptor.Level.BODY
+        level: HttpLoggingInterceptor.Level = HttpLoggingInterceptor.Level.BODY
     ): OkHttpClient.Builder {
         if (BuildConfig.DEBUG) {
             val logging = HttpLoggingInterceptor()
