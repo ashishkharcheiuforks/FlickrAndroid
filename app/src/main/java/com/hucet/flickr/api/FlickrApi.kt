@@ -3,6 +3,7 @@ package com.hucet.flickr.api
 import androidx.lifecycle.LiveData
 import com.hucet.flickr.BuildConfig
 import com.hucet.flickr.vo.MetaPhoto
+import com.hucet.flickr.vo.PhotoResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
@@ -23,7 +24,7 @@ interface FlickrApi {
         object QueryValue {
             const val METHOD = "flickr.photos.search"
             const val FORMAT = "json"
-            const val EXTRAS = "description"
+            const val EXTRAS = "description, url_s"
             const val NO_JSON_CALLBACK = 1
         }
     }
@@ -36,5 +37,5 @@ interface FlickrApi {
             @Query(QueryKey.API_KEY) apiKey: String = BuildConfig.API_KEY,
             @Query(QueryKey.FORMAT) format: String = QueryValue.FORMAT,
             @Query(QueryKey.NO_JSON_CALLBACK) noJsonCallback: Int = QueryValue.NO_JSON_CALLBACK
-    ): LiveData<ApiResponse<MetaPhoto>>
+    ): LiveData<ApiResponse<PhotoResponse>>
 }
