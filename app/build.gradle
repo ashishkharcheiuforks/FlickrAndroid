@@ -1,0 +1,124 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'com.android.application'
+apply plugin: 'jacoco'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-allopen'
+apply from: "$project.rootDir/script/static-analysis.gradle"
+apply from: "$project.rootDir/script/jacoco.gradle"
+apply from: "env.gradle"
+//apply from: 'signing.gradle'
+apply plugin: 'project-report'
+
+allOpen {
+    // allows mocking for classes w/o directly opening them for release builds
+    annotation 'com.hucet.flickr.OpenClass'
+}
+
+android {
+    compileSdkVersion build_versions.target_sdk
+    buildToolsVersion build_versions.build_tools
+    defaultConfig {
+        applicationId "com.hucet.flickr"
+        minSdkVersion build_versions.min_sdk
+        targetSdkVersion build_versions.target_sdk
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "com.hucet.flickr.testing.TestRunner"
+    }
+    buildTypes {
+        debug {
+            testCoverageEnabled true
+            applicationIdSuffix ".debug"
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+//            signingConfig signingConfigs.release
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    dataBinding {
+        enabled = true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    sourceSets {
+        androidTest.java.srcDirs += "src/test-common/java"
+        test.java.srcDirs += "src/test-common/java"
+    }
+
+    testOptions.unitTests.includeAndroidResources = true
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    debugImplementation deps.leakcanary.debug
+    releaseImplementation deps.leakcanary.release
+    debugImplementation deps.leakcanary.fragment
+
+    implementation deps.androidX.appCompat
+    implementation deps.androidX.recyclerview
+    implementation deps.androidX.cardview
+    implementation deps.androidX.material
+
+    implementation deps.androidX.room.runtime
+    implementation deps.androidX.lifecycle.runtime
+    implementation deps.androidX.lifecycle.extensions
+    implementation deps.androidX.lifecycle.commonJava8
+
+    implementation deps.glide.runtime
+    kapt deps.glide.compiler
+    implementation 'com.github.bumptech.glide:okhttp3-integration:4.8.0'
+    implementation deps.dagger.runtime
+    implementation deps.dagger.android
+    implementation deps.dagger.android_support
+    implementation deps.androidX.constraintlayout
+    implementation deps.kotlin.stdlib
+
+    implementation deps.timber
+
+    debugImplementation deps.stetho
+
+    implementation deps.kotlin.coroutines_core
+    implementation deps.kotlin.coroutines_android
+
+    implementation "org.jsoup:jsoup:1.11.3"
+    implementation deps.core_ktx
+    kapt deps.dagger.android_support_compiler
+    kapt deps.dagger.compiler
+    kapt deps.androidX.room.compiler
+    kapt deps.androidX.lifecycle.compiler
+
+    testImplementation deps.junit
+    testImplementation deps.robolectric
+    testImplementation deps.androidX.test.archCore
+    testImplementation deps.mockito.core
+    testImplementation deps.mock_kotlin
+    testImplementation deps.androidX.test.monitor
+    testImplementation deps.kotlintest.assertions
+    testImplementation deps.androidX.test.core
+
+    androidTestImplementation deps.atsl.runner
+    androidTestImplementation deps.atsl.rules
+    androidTestImplementation deps.androidX.test.espressoCore
+    androidTestImplementation deps.androidX.test.espressoContrib
+    androidTestImplementation deps.androidX.test.espressoIntents
+    androidTestImplementation deps.androidX.test.extJunit
+    androidTestImplementation deps.work.testing
+    androidTestImplementation deps.mockito.core
+    androidTestImplementation deps.arch_core.testing
+    androidTestImplementation deps.mockito.android
+    androidTestImplementation deps.uiautomator
+}
+
+repositories {
+    maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.fabric.io/public' }
+}

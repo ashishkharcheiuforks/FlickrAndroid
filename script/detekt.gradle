@@ -1,0 +1,10 @@
+apply plugin: "io.gitlab.arturbosch.detekt"
+
+
+detekt {
+    toolVersion = '1.0.0-RC11'
+    input = files("$projectDir")
+    config = files("$rulesDir/detekt.yml")
+    filters = ".*test.*,.*/resources/.*,.*/tmp/.*"
+    parallel = true
+}
