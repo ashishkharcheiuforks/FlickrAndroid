@@ -5,7 +5,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.hucet.flickr.testing.AppExecutors
+import com.hucet.flickr.utils.AppExecutors
 
 /**
  * A generic RecyclerView adapter that uses Data Binding & DiffUtil.
@@ -14,8 +14,8 @@ import com.hucet.flickr.testing.AppExecutors
  * @param <V> The type of the ViewDataBinding
 </V></T> */
 abstract class DataBoundListAdapter<T, V : ViewDataBinding>(
-    appExecutors: AppExecutors,
-    diffCallback: DiffUtil.ItemCallback<T>
+        appExecutors: AppExecutors,
+        diffCallback: DiffUtil.ItemCallback<T>
 ) : ListAdapter<T, DataBoundViewHolder<V>>(
         AsyncDifferConfig.Builder<T>(diffCallback)
                 .setBackgroundThreadExecutor(appExecutors.diskIO())

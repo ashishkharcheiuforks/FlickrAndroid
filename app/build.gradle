@@ -72,10 +72,12 @@ dependencies {
     implementation deps.androidX.lifecycle.runtime
     implementation deps.androidX.lifecycle.extensions
     implementation deps.androidX.lifecycle.commonJava8
+    implementation deps.okhttp_logging_interceptor
+    implementation deps.retrofit.runtime
+    implementation deps.retrofit.gson
 
     implementation deps.glide.runtime
     kapt deps.glide.compiler
-    implementation 'com.github.bumptech.glide:okhttp3-integration:4.8.0'
     implementation deps.dagger.runtime
     implementation deps.dagger.android
     implementation deps.dagger.android_support
