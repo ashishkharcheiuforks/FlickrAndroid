@@ -24,5 +24,4 @@ abstract class ViewModelModule {
     @IntoMap
     @ViewModelKey(FlickrSearchViewModel::class)
     abstract fun bindFlickrSearchViewModel(viewModel: FlickrSearchViewModel): ViewModel
-
 }

@@ -9,12 +9,11 @@ import com.hucet.flickr.databinding.KeywordItemBinding
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.view.common.adapter.DataBoundListAdapter
 
-
 typealias ITEM_KEYWORD = String
 
 class KeywordAdapter constructor(
-        appExecutors: AppExecutors,
-        private val callback: ((ITEM_KEYWORD) -> Unit)?
+    appExecutors: AppExecutors,
+    private val callback: ((ITEM_KEYWORD) -> Unit)?
 ) : DataBoundListAdapter<ITEM_KEYWORD, KeywordItemBinding>(
         appExecutors = appExecutors,
         diffCallback = object : DiffUtil.ItemCallback<ITEM_KEYWORD>() {

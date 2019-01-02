@@ -8,15 +8,12 @@ import com.hucet.flickr.OpenForTesting
 import com.hucet.flickr.api.ApiResponse
 import com.hucet.flickr.repository.PhotoRepository
 import com.hucet.flickr.utils.AbsentLiveData
-import com.hucet.flickr.vo.MetaPhoto
-import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.PhotoResponse
-import com.hucet.flickr.vo.Resource
 import javax.inject.Inject
 
 @OpenForTesting
 class FlickrSearchViewModel @Inject constructor(
-        private val repository: PhotoRepository
+    private val repository: PhotoRepository
 ) : ViewModel() {
     private val searchKeyword = MutableLiveData<String>()
 

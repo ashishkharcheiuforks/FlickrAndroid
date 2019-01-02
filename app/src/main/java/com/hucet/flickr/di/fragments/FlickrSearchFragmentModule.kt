@@ -5,7 +5,7 @@ import dagger.Module
 import dagger.android.ContributesAndroidInjector
 
 @Module
-abstract class FragmentBuildersModule {
+abstract class FlickrSearchFragmentModule {
     @ContributesAndroidInjector
     abstract fun bindFlickrSearchFragment(): FlickrSearchFragment
 }

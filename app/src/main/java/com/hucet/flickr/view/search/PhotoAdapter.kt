@@ -6,19 +6,17 @@ import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
 import com.hucet.flickr.R
-import com.hucet.flickr.databinding.KeywordItemBinding
 import com.hucet.flickr.databinding.PhotoItemBinding
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.view.common.adapter.DataBoundListAdapter
 import com.hucet.flickr.vo.Photo
 
-
 typealias ITEM_PHOTO = Photo
 
 class PhotoAdapter constructor(
-        private val dataBindingComponent: DataBindingComponent,
-        appExecutors: AppExecutors,
-        private val callback: ((ITEM_PHOTO) -> Unit)?
+    private val dataBindingComponent: DataBindingComponent,
+    appExecutors: AppExecutors,
+    private val callback: ((ITEM_PHOTO) -> Unit)?
 ) : DataBoundListAdapter<ITEM_PHOTO, PhotoItemBinding>(
         appExecutors = appExecutors,
         diffCallback = object : DiffUtil.ItemCallback<ITEM_PHOTO>() {

@@ -10,6 +10,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.hucet.flickr.R
 import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiSuccessResponse
@@ -86,18 +87,17 @@ class FlickrSearchFragment : Fragment(), Injectable {
         }
         keywordRecyclerView.apply {
             adapter = keywordAdapter
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.HORIZONTAL, false)
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         }
         keywordAdapter.submitList(keywords)
     }
 
     private fun initPhotoAdapter() {
         photoAdapter = PhotoAdapter(dataBindingComponent, appExecutors) {
-
         }
         photoRecyclerView.apply {
             adapter = photoAdapter
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
         viewModel.search(keywords.first())
     }

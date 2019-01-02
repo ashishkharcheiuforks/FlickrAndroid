@@ -2,9 +2,7 @@ package com.hucet.flickr.api
 
 import androidx.lifecycle.LiveData
 import com.hucet.flickr.BuildConfig
-import com.hucet.flickr.vo.MetaPhoto
 import com.hucet.flickr.vo.PhotoResponse
-import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -31,11 +29,11 @@ interface FlickrApi {
 
     @GET(SEARCH_PATH)
     fun getPhotos(
-            @Query(QueryKey.TEXT) text: String,
-            @Query(QueryKey.EXTRAS) extras: String = QueryValue.EXTRAS,
-            @Query(QueryKey.METHOD) method: String = QueryValue.METHOD,
-            @Query(QueryKey.API_KEY) apiKey: String = BuildConfig.API_KEY,
-            @Query(QueryKey.FORMAT) format: String = QueryValue.FORMAT,
-            @Query(QueryKey.NO_JSON_CALLBACK) noJsonCallback: Int = QueryValue.NO_JSON_CALLBACK
+        @Query(QueryKey.TEXT) text: String,
+        @Query(QueryKey.EXTRAS) extras: String = QueryValue.EXTRAS,
+        @Query(QueryKey.METHOD) method: String = QueryValue.METHOD,
+        @Query(QueryKey.API_KEY) apiKey: String = BuildConfig.API_KEY,
+        @Query(QueryKey.FORMAT) format: String = QueryValue.FORMAT,
+        @Query(QueryKey.NO_JSON_CALLBACK) noJsonCallback: Int = QueryValue.NO_JSON_CALLBACK
     ): LiveData<ApiResponse<PhotoResponse>>
 }

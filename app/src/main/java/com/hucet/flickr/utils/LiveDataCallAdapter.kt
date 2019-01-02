@@ -16,7 +16,6 @@
 
 package com.hucet.flickr.utils
 
-
 import androidx.lifecycle.LiveData
 import com.hucet.flickr.api.ApiResponse
 import retrofit2.Call

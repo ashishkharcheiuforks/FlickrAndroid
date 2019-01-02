@@ -14,8 +14,8 @@ import com.hucet.flickr.utils.AppExecutors
  * @param <V> The type of the ViewDataBinding
 </V></T> */
 abstract class DataBoundListAdapter<T, V : ViewDataBinding>(
-        appExecutors: AppExecutors,
-        diffCallback: DiffUtil.ItemCallback<T>
+    appExecutors: AppExecutors,
+    diffCallback: DiffUtil.ItemCallback<T>
 ) : ListAdapter<T, DataBoundViewHolder<V>>(
         AsyncDifferConfig.Builder<T>(diffCallback)
                 .setBackgroundThreadExecutor(appExecutors.diskIO())
