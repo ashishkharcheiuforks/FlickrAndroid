@@ -1,23 +1,17 @@
 package com.hucet.flickr.view.search
 
-import android.animation.Animator
 import android.content.Context
 import android.os.Bundle
-import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.Animation
-import android.widget.ImageView
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
 import com.hucet.flickr.GlideApp
 import com.hucet.flickr.R
 import com.hucet.flickr.api.ApiErrorResponse
@@ -28,9 +22,7 @@ import com.hucet.flickr.di.Injectable
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
-import com.hucet.flickr.view.detail.FlickrDetailFragment
 import com.hucet.flickr.vo.Photo
-import kotlinx.android.synthetic.main.abc_activity_chooser_view.image
 import kotlinx.android.synthetic.main.fragment_flickr_search.*
 import timber.log.Timber
 import javax.inject.Inject

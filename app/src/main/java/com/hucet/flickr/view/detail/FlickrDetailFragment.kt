@@ -20,7 +20,6 @@ import com.hucet.flickr.databinding.FragmentFlickrDetailBinding
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
 import com.hucet.flickr.vo.Photo
-import timber.log.Timber
 
 class FlickrDetailFragment : Fragment() {
     companion object {
@@ -29,7 +28,6 @@ class FlickrDetailFragment : Fragment() {
                 arguments = bundleOf(
                         ArgKey.Photo.name to photo
                 )
-
             }
         }
     }

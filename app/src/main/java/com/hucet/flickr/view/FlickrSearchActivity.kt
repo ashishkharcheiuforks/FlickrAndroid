@@ -14,7 +14,6 @@ import com.hucet.flickr.view.search.SearchNavigation
 import com.hucet.flickr.vo.Photo
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
-import timber.log.Timber
 import javax.inject.Inject
 
 class FlickrSearchActivity : AppCompatActivity(), HasSupportFragmentInjector, SearchNavigation {
