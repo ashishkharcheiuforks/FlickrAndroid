@@ -2,6 +2,7 @@ package com.hucet.flickr.view.search
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.ViewCompat
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DiffUtil
@@ -10,6 +11,7 @@ import com.hucet.flickr.databinding.PhotoItemBinding
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.view.common.adapter.DataBoundListAdapter
 import com.hucet.flickr.vo.Photo
+import timber.log.Timber
 
 typealias ITEM_PHOTO = Photo
 
@@ -46,7 +48,10 @@ class PhotoAdapter constructor(
         return binding
     }
 
-    override fun bind(binding: PhotoItemBinding, item: ITEM_PHOTO) {
+    override fun bind(binding: PhotoItemBinding, item: ITEM_PHOTO, position: Int) {
         binding.photo = item
+        val transitionName = "transition $position"
+        binding.photoImageView.transitionName = transitionName
+        Timber.i("bind transition name: [$transitionName]")
     }
 }

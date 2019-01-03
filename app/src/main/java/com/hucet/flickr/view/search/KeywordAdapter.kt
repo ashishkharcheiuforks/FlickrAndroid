@@ -41,7 +41,7 @@ class KeywordAdapter constructor(
         return binding
     }
 
-    override fun bind(binding: KeywordItemBinding, item: ITEM_KEYWORD) {
+    override fun bind(binding: KeywordItemBinding, item: ITEM_KEYWORD, position: Int) {
         binding.keyword = item
     }
 }

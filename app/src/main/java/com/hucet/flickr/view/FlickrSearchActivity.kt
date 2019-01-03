@@ -1,57 +1,56 @@
 package com.hucet.flickr.view
 
-import android.content.Context
 import android.os.Bundle
 import android.transition.Fade
-import android.transition.Slide
 import android.transition.TransitionInflater
-import android.transition.TransitionSet
-import android.view.Gravity
-import android.widget.ImageView
+import androidx.annotation.IdRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.transition.ChangeBounds
 import com.hucet.flickr.R
-import com.hucet.flickr.view.detail.DetailTransition
+import com.hucet.flickr.databinding.PhotoItemBinding
 import com.hucet.flickr.view.detail.FlickrDetailFragment
 import com.hucet.flickr.view.search.FlickrSearchFragment
 import com.hucet.flickr.view.search.SearchNavigation
-import com.hucet.flickr.view.search.SearchTransition
 import com.hucet.flickr.vo.Photo
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
+import timber.log.Timber
 import javax.inject.Inject
 
 class FlickrSearchActivity : AppCompatActivity(), HasSupportFragmentInjector, SearchNavigation {
     @Inject
     lateinit var dispatchingAndroidInjector: DispatchingAndroidInjector<Fragment>
 
+    @IdRes private val containerIdRes = android.R.id.content
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         if (savedInstanceState == null) {
             supportFragmentManager
                     .beginTransaction()
-                    .replace(android.R.id.content, FlickrSearchFragment.newInstance())
+                    .replace(containerIdRes, FlickrSearchFragment.newInstance())
                     .commit()
         }
     }
 
-    override fun navigateDetail(fromFragment: Fragment, imageView: ImageView, photo: Photo) {
-        imageView.transitionName = getString(R.string.flickr_transition_name)
+    override fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo) {
+        val fromFragment = supportFragmentManager.findFragmentById(containerIdRes) ?: return
+
+        val context = this
         val toFragment = FlickrDetailFragment.newInstance(photo).apply {
-            val detailTranstion = DetailTransition(this@FlickrSearchActivity)
-            sharedElementEnterTransition = detailTranstion
+            val transition = TransitionInflater.from(context).inflateTransition(R.transition.image_shared_element_transition)
+            sharedElementEnterTransition = transition
+            sharedElementReturnTransition = transition
+            enterTransition = Fade()
         }
 
         fromFragment.apply {
-            exitTransition = SearchTransition(this@FlickrSearchActivity)
+            exitTransition = Fade()
         }
-
         supportFragmentManager
                 .beginTransaction()
-                .setReorderingAllowed(true) // Optimize for shared element transition
-                .addSharedElement(imageView, getString(R.string.flickr_transition_name))
-                .replace(android.R.id.content, toFragment)
+                .addSharedElement(photoBinding.photoImageView, getString(R.string.flickr_transition_name))
+                .replace(containerIdRes, toFragment)
                 .addToBackStack(null)
                 .commit()
     }
