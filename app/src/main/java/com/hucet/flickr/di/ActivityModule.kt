@@ -2,7 +2,7 @@ package com.hucet.flickr.di
 
 import com.hucet.flickr.di.fragments.FlickrSearchFragmentModule
 import com.hucet.flickr.di.scopes.PerActivity
-import com.hucet.flickr.view.search.FlickrSearchActivity
+import com.hucet.flickr.view.FlickrSearchActivity
 import dagger.Module
 import dagger.android.ContributesAndroidInjector
 

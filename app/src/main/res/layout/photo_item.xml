@@ -4,15 +4,23 @@
         xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
                 name="photo"
-                type="com.hucet.flickr.vo.Photo"/>
+                type="com.hucet.flickr.vo.Photo" />
     </data>
 
-    <androidx.cardview.widget.CardView
+    <androidx.cardview.widget.CardView xmlns:card_view="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/cardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_gravity="center_horizontal"
+            android:clipChildren="false"
+            android:padding="2dp"
+            card_view:cardCornerRadius="2dp"
+            card_view:cardElevation="2dp"
+            card_view:cardPreventCornerOverlap="true"
+            card_view:cardUseCompatPadding="true">
 
         <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
@@ -21,24 +29,25 @@
             <ImageView
                     android:id="@+id/photoImageView"
                     android:layout_width="match_parent"
-                    android:layout_height="100dp"
+                    android:layout_height="200dp"
+                    app:imageUrl="@{photo.imageOrigin}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:imageUrl="@{photo.urlSmall}"
                     tools:src="@color/colorPrimary" />
 
             <TextView
                     android:id="@+id/photoTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:background="@color/bg_photo_item"
+                    android:background="@color/bg_photo_title"
+                    android:maxLines="1"
+                    android:text="@{photo.title}"
                     android:textColor="@android:color/white"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    android:text="@{photo.title}"
                     tools:text="This is apple" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 

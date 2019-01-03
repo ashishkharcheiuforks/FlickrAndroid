@@ -10,13 +10,14 @@ import com.hucet.flickr.databinding.PhotoItemBinding
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.view.common.adapter.DataBoundListAdapter
 import com.hucet.flickr.vo.Photo
+import timber.log.Timber
 
 typealias ITEM_PHOTO = Photo
 
 class PhotoAdapter constructor(
     private val dataBindingComponent: DataBindingComponent,
     appExecutors: AppExecutors,
-    private val callback: ((ITEM_PHOTO) -> Unit)?
+    private val callback: ((PhotoItemBinding, ITEM_PHOTO) -> Unit)?
 ) : DataBoundListAdapter<ITEM_PHOTO, PhotoItemBinding>(
         appExecutors = appExecutors,
         diffCallback = object : DiffUtil.ItemCallback<ITEM_PHOTO>() {
@@ -40,13 +41,16 @@ class PhotoAdapter constructor(
         )
         binding.root.setOnClickListener {
             binding.photo?.let {
-                callback?.invoke(it)
+                callback?.invoke(binding, it)
             }
         }
         return binding
     }
 
-    override fun bind(binding: PhotoItemBinding, item: ITEM_PHOTO) {
+    override fun bind(binding: PhotoItemBinding, item: ITEM_PHOTO, position: Int) {
         binding.photo = item
+        val transitionName = "transition $position"
+        binding.photoImageView.transitionName = transitionName
+        Timber.i("bind transition name: [$transitionName]")
     }
 }

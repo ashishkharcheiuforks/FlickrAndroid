@@ -1,5 +1,6 @@
 package com.hucet.flickr.view.search
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,20 +12,26 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hucet.flickr.GlideApp
 import com.hucet.flickr.R
 import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.databinding.FragmentFlickrSearchBinding
+import com.hucet.flickr.databinding.PhotoItemBinding
 import com.hucet.flickr.di.Injectable
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
+import com.hucet.flickr.vo.Photo
 import kotlinx.android.synthetic.main.fragment_flickr_search.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class FlickrSearchFragment : Fragment(), Injectable {
+interface SearchNavigation {
+    fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo)
+}
 
+class FlickrSearchFragment : Fragment(), Injectable {
     companion object {
         fun newInstance(): FlickrSearchFragment {
             return FlickrSearchFragment()
@@ -49,6 +56,15 @@ class FlickrSearchFragment : Fragment(), Injectable {
     var binding by autoCleared<FragmentFlickrSearchBinding>()
 
     var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
+
+    private var searchNavigator: SearchNavigation? = null
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is SearchNavigation)
+            searchNavigator = context
+        else
+            throw TypeCastException("$context + must implement EnrollNavigation")
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
@@ -89,16 +105,27 @@ class FlickrSearchFragment : Fragment(), Injectable {
             adapter = keywordAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
         }
+        keywordRecyclerView.setRecyclerListener {
+            val imageView = (it as? PhotoItemBinding)?.photoImageView
+            imageView?.let {
+                GlideApp.with(this).clear(it)
+            }
+        }
         keywordAdapter.submitList(keywords)
     }
 
     private fun initPhotoAdapter() {
-        photoAdapter = PhotoAdapter(dataBindingComponent, appExecutors) {
+        photoAdapter = PhotoAdapter(dataBindingComponent, appExecutors) { itemView, photo ->
+            navigateDetail(itemView, photo)
         }
         photoRecyclerView.apply {
             adapter = photoAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
         viewModel.search(keywords.first())
+    }
+
+    private fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo) {
+        searchNavigator?.navigateDetail(photoBinding, photo)
     }
 }

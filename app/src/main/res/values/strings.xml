@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Flickr</string>
+    <string name="flickr_transition_name">flickr_transition_name</string>
 </resources>
