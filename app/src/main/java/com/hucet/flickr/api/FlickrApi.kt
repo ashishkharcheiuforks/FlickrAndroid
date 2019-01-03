@@ -22,7 +22,7 @@ interface FlickrApi {
         object QueryValue {
             const val METHOD = "flickr.photos.search"
             const val FORMAT = "json"
-            const val EXTRAS = "description, url_s"
+            const val EXTRAS = "description, url_o"
             const val NO_JSON_CALLBACK = 1
         }
     }

@@ -5,6 +5,6 @@ import com.google.gson.annotations.SerializedName
 data class Photo(
     val id: Long,
     val title: String,
-    @SerializedName("url_c")
-    val urlSmall: String
+    @SerializedName("url_o")
+    val imageOrigin: String
 )
