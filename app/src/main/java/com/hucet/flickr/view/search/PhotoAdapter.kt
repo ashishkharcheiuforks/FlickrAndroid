@@ -16,7 +16,7 @@ typealias ITEM_PHOTO = Photo
 class PhotoAdapter constructor(
     private val dataBindingComponent: DataBindingComponent,
     appExecutors: AppExecutors,
-    private val callback: ((ITEM_PHOTO) -> Unit)?
+    private val callback: ((PhotoItemBinding, ITEM_PHOTO) -> Unit)?
 ) : DataBoundListAdapter<ITEM_PHOTO, PhotoItemBinding>(
         appExecutors = appExecutors,
         diffCallback = object : DiffUtil.ItemCallback<ITEM_PHOTO>() {
@@ -40,7 +40,7 @@ class PhotoAdapter constructor(
         )
         binding.root.setOnClickListener {
             binding.photo?.let {
-                callback?.invoke(it)
+                callback?.invoke(binding, it)
             }
         }
         return binding

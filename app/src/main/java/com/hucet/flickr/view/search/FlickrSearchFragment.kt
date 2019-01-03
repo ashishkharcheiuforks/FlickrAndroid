@@ -1,9 +1,12 @@
 package com.hucet.flickr.view.search
 
+import android.content.Context
 import android.os.Bundle
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -19,12 +22,18 @@ import com.hucet.flickr.di.Injectable
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
+import com.hucet.flickr.view.detail.FlickrDetailFragment
+import com.hucet.flickr.vo.Photo
+import kotlinx.android.synthetic.main.abc_activity_chooser_view.image
 import kotlinx.android.synthetic.main.fragment_flickr_search.*
 import timber.log.Timber
 import javax.inject.Inject
 
-class FlickrSearchFragment : Fragment(), Injectable {
+interface SearchNavigation {
+    fun navigateDetail(fragment: Fragment, imageView: ImageView, photo: Photo)
+}
 
+class FlickrSearchFragment : Fragment(), Injectable {
     companion object {
         fun newInstance(): FlickrSearchFragment {
             return FlickrSearchFragment()
@@ -50,13 +59,22 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
+    private var searchNavigator: SearchNavigation? = null
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is SearchNavigation)
+            searchNavigator = context
+        else
+            throw TypeCastException("$context + must implement EnrollNavigation")
+    }
+
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
-                inflater,
-                R.layout.fragment_flickr_search,
-                container,
-                false,
-                dataBindingComponent
+            inflater,
+            R.layout.fragment_flickr_search,
+            container,
+            false,
+            dataBindingComponent
         )
         return binding.root
     }
@@ -93,12 +111,17 @@ class FlickrSearchFragment : Fragment(), Injectable {
     }
 
     private fun initPhotoAdapter() {
-        photoAdapter = PhotoAdapter(dataBindingComponent, appExecutors) {
+        photoAdapter = PhotoAdapter(dataBindingComponent, appExecutors) { itemView, photo ->
+            navigateDetail(itemView.photoImageView, photo)
         }
         photoRecyclerView.apply {
             adapter = photoAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
         viewModel.search(keywords.first())
+    }
+
+    private fun navigateDetail(imageView: ImageView, photo: Photo) {
+        searchNavigator?.navigateDetail(this, imageView, photo)
     }
 }
