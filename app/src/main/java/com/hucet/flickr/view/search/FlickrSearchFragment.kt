@@ -12,18 +12,19 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hucet.flickr.GlideApp
 import com.hucet.flickr.R
 import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.databinding.FragmentFlickrSearchBinding
 import com.hucet.flickr.databinding.PhotoItemBinding
 import com.hucet.flickr.di.Injectable
+import com.hucet.flickr.glide.GlideApp
 import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
 import com.hucet.flickr.vo.Photo
-import kotlinx.android.synthetic.main.fragment_flickr_search.*
+import kotlinx.android.synthetic.main.fragment_flickr_search.keywordRecyclerView
+import kotlinx.android.synthetic.main.fragment_flickr_search.photoRecyclerView
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -68,11 +69,11 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
-                inflater,
-                R.layout.fragment_flickr_search,
-                container,
-                false,
-                dataBindingComponent
+            inflater,
+            R.layout.fragment_flickr_search,
+            container,
+            false,
+            dataBindingComponent
         )
         return binding.root
     }

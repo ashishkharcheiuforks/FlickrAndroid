@@ -5,6 +5,9 @@
 
     <data>
 
+        <variable
+                name="photo"
+                type="com.hucet.flickr.vo.Photo" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -16,17 +19,24 @@
                 android:id="@+id/detailImageView"
                 android:layout_width="match_parent"
                 android:layout_height="300dp"
+                android:transitionName="@string/flickr_transition_name"
+                app:imageUrl="@{photo}"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:transitionName="@string/flickr_transition_name"/>
+                app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
+                android:id="@+id/detailDesc"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:lines="4"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/detailImageView"
+                app:layout_constraintVertical_bias="0.05"
                 tools:text="Cool Fancy Text Generator is a copy and paste font generator and font changer that creates Twitter, Facebook, Instagram fonts. It converts a normal text to different free cool fonts styles, such as tattoo fonts, calligraphy fonts, web script fonts, cursive fonts, handwriting fonts, old English fonts, word fonts, pretty fonts, font art... Facebook, Twitter, Instagram Fonts or Fonts for Instagram, Twitter, Facebook - If that is what you want then this tool is a perfect place to go because it provides more than that!" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>
