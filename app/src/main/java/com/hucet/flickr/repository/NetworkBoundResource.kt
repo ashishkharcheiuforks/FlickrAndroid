@@ -20,14 +20,11 @@ import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
 import com.hucet.flickr.api.ApiEmptyResponse
 import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiResponse
 import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.utils.AppExecutors
-import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.Resource
 
 /**

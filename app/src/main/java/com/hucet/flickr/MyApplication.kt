@@ -3,8 +3,6 @@ package com.hucet.flickr
 import android.app.Activity
 import android.app.Application
 import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
-import com.facebook.stetho.Stetho
 import com.hucet.flickr.debug.OptionalTree
 import com.hucet.flickr.di.AppInjector
 import com.hucet.flickr.glide.GlideApp
@@ -22,13 +20,6 @@ open class MyApplication : Application(), HasActivityInjector {
         initDagger()
         initTimber()
         initLeakCanary()
-        initStetho()
-    }
-
-    open fun initStetho() {
-        if (BuildConfig.DEBUG) {
-            Stetho.initializeWithDefaults(this)
-        }
     }
     open fun initStrictMode() {
         if (BuildConfig.DEBUG) {

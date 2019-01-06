@@ -10,7 +10,6 @@ import com.hucet.flickr.db.dao.FlickrDao
 import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.PhotoSearchResult
 
-
 @Database(
     entities = [
         Photo::class,
@@ -40,7 +39,7 @@ abstract class FlickrDatabase : RoomDatabase() {
         fun getInstanceInMemory(context: Context): FlickrDatabase {
             INSTANCE = Room.inMemoryDatabaseBuilder(context.applicationContext, FlickrDatabase::class.java)
                 .allowMainThreadQueries()
-                .populate(context)
+                .populate()
                 .build()
             return INSTANCE!!
         }
@@ -48,15 +47,15 @@ abstract class FlickrDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context): FlickrDatabase {
             return Room.databaseBuilder(
                 context,
-                FlickrDatabase::class.java, "flickr_4"
+                FlickrDatabase::class.java, "flickr12"
             )
-                .populate(context)
+                .populate()
                 .build()
         }
     }
 }
 
-private fun <T : RoomDatabase> RoomDatabase.Builder<T>.populate(context: Context): RoomDatabase.Builder<T> {
+private fun <T : RoomDatabase> RoomDatabase.Builder<T>.populate(): RoomDatabase.Builder<T> {
     return this.addCallback(object : RoomDatabase.Callback() {
         override fun onCreate(db: SupportSQLiteDatabase) {
             super.onCreate(db)

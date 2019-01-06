@@ -1,8 +1,6 @@
 package com.hucet.flickr.view
 
 import android.os.Bundle
-import android.transition.ChangeBounds
-import android.transition.ChangeClipBounds
 import android.transition.Fade
 import android.transition.TransitionInflater
 import android.transition.TransitionSet
@@ -18,7 +16,6 @@ import com.hucet.flickr.vo.Photo
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
 import kotlinx.android.synthetic.main.activity_flickr_main.toolbar
-import kotlinx.android.synthetic.main.fragment_flickr_search.keywordRecyclerView
 import javax.inject.Inject
 
 class FlickrSearchActivity : AppCompatActivity(), HasSupportFragmentInjector, SearchViewInterface {
@@ -44,7 +41,7 @@ class FlickrSearchActivity : AppCompatActivity(), HasSupportFragmentInjector, Se
         supportActionBar?.title = getString(R.string.prefix_search_toolbar_title, title)
     }
 
-    override fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo) {
+    override fun navigateDetail(keyword: String, photoBinding: PhotoItemBinding, photo: Photo) {
         val fromFragment = supportFragmentManager.findFragmentById(containerIdRes) ?: return
 
         val context = this

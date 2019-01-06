@@ -1,27 +1,29 @@
 package com.hucet.flickr.repository
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Observer
 import androidx.test.core.app.ApplicationProvider
 import com.hucet.flickr.api.ApiResponse
-import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.api.FlickrApi
 import com.hucet.flickr.db.FlickrDatabase
 import com.hucet.flickr.testing.InstantAppExecutors
 import com.hucet.flickr.testing.TestApplication
 import com.hucet.flickr.testing.TestException
 import com.hucet.flickr.testing.fixture.FlickrLoader
-import com.hucet.flickr.vo.*
-import com.nhaarman.mockito_kotlin.*
-import io.kotlintest.matchers.collections.shouldContainAll
+import com.hucet.flickr.utils.createPairObserverCaptor
+import com.hucet.flickr.utils.stubSearchPhotos
+import com.hucet.flickr.utils.stubSuccessSearchPhotos
+import com.hucet.flickr.vo.Photo
+import com.hucet.flickr.vo.PhotoResponse
+import com.hucet.flickr.vo.PhotoSearchResult
+import com.hucet.flickr.vo.Resource
+import com.nhaarman.mockito_kotlin.times
+import com.nhaarman.mockito_kotlin.verify
 import io.kotlintest.shouldBe
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
@@ -120,53 +122,4 @@ class PhotoRepositoryTest {
         captor.secondValue shouldBe Resource.success(expects[0].metaPhotos.photos)
         captor.lastValue shouldBe Resource.success(expects[0].metaPhotos.photos + expects[1].metaPhotos.photos)
     }
-}
-
-inline fun <reified T> createPairObserverCaptor(): Pair<Observer<T>, KArgumentCaptor<T>> {
-    val captor = KArgumentCaptor(ArgumentCaptor.forClass(T::class.java), T::class)
-    val observer = mock<Observer<T>>()
-    return observer to captor
-}
-
-fun FlickrApi.stubSuccessSearchPhotos(keyword: String?): List<PhotoResponse> {
-    val firstData = FlickrLoader.Paging.first()
-    val firstLiveData = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-        value = ApiSuccessResponse(firstData)
-    }
-    val secondData = FlickrLoader.Paging.second()
-    val secondLiveData = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-        value = ApiSuccessResponse(secondData)
-    }
-    val thirdData = FlickrLoader.Paging.third()
-    val thirdLiveData = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-        value = ApiSuccessResponse(thirdData)
-    }
-
-    doAnswer {
-        val page = it.arguments[1]
-
-        when (page) {
-            1 -> {
-                firstLiveData
-            }
-            2 -> {
-                secondLiveData
-            }
-            else -> {
-                thirdLiveData
-            }
-        }
-    }.`when`(this).searchPhotos(
-            keyword ?: any(), any(),
-            any(), any(), any(), any(), any(), any(), any()
-    )
-    return listOf(firstData, secondData, thirdData)
-}
-
-
-fun FlickrApi.stubSearchPhotos(keyword: String?, expects: LiveData<ApiResponse<PhotoResponse>>) {
-    doReturn(expects).`when`(this).searchPhotos(
-            keyword ?: any(), any(),
-            any(), any(), any(), any(), any(), any(), any()
-    )
 }

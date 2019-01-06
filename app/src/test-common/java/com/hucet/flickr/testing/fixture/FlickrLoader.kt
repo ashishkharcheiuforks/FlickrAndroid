@@ -8,12 +8,10 @@ object FlickrLoader {
     private val gson = Gson()
     private fun loadFromResources(path: String): String = this::class.java.classLoader.getResource(path).readText()
 
-
     object Paging {
         fun first(): PhotoResponse {
             val json = FlickrLoader.loadFromResources("flickr/page/first.page.json")
             return gson.fromJson(json, PhotoResponse::class.java)
-
         }
 
         fun second(): PhotoResponse {
@@ -26,5 +24,4 @@ object FlickrLoader {
             return gson.fromJson(json, PhotoResponse::class.java)
         }
     }
-
 }

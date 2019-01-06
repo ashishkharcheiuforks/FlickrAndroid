@@ -13,7 +13,4 @@ class TestApplication : MyApplication() {
 
     override fun initDagger() {
     }
-
-    override fun initStetho() {
-    }
 }

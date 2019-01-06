@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.Transformations
 import com.hucet.flickr.OpenForTesting
 import com.hucet.flickr.api.ApiResponse
-import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.api.FlickrApi
 import com.hucet.flickr.db.FlickrDatabase
 import com.hucet.flickr.db.dao.FlickrDao
@@ -23,9 +22,9 @@ interface PhotoRepository {
     @Singleton
     @OpenForTesting
     class Impl @Inject constructor(
-            private val remoteApi: FlickrApi,
-            private val db: FlickrDatabase,
-            private val appExecutors: AppExecutors
+        private val remoteApi: FlickrApi,
+        private val db: FlickrDatabase,
+        private val appExecutors: AppExecutors
     ) : PhotoRepository {
         private val dao: FlickrDao = db.flickrDao()
 

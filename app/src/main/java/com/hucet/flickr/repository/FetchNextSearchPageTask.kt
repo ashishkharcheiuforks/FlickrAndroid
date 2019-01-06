@@ -9,6 +9,7 @@ import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiResponse
 import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.utils.AppExecutors
+import com.hucet.flickr.utils.RichEndChecker
 import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.PhotoResponse
 import com.hucet.flickr.vo.PhotoSearchResult
@@ -18,7 +19,7 @@ import com.hucet.flickr.vo.Resource
  * A task that reads the search result in the database and fetches the next page, if it has one.
  */
 abstract class FetchNextSearchPageTask(
-        appExecutors: AppExecutors
+    appExecutors: AppExecutors
 ) {
     private val result = MediatorLiveData<Resource<Boolean>>()
 
@@ -40,10 +41,11 @@ abstract class FetchNextSearchPageTask(
                     val response = it
                     when (response) {
                         is ApiSuccessResponse -> {
-                            val ids = arrayListOf<Long>()
-                            ids.addAll(current.photoIds)
+                            val ids = arrayListOf<Long>().apply {
+                                addAll(current.photoIds)
 
-                            ids.addAll(response.body.metaPhotos.photos.map { it.id })
+                                addAll(response.body.metaPhotos.photos.map { it.id })
+                            }
 
                             val photoSearchResult = PhotoSearchResult(
                                     keyword = current.keyword,
@@ -53,7 +55,7 @@ abstract class FetchNextSearchPageTask(
                             appExecutors.diskIO().execute {
                                 savePhotosSearchResult(response.body.metaPhotos.photos, photoSearchResult)
                                 appExecutors.mainThread().execute {
-                                    result.value = Resource.success(true)
+                                    result.value = Resource.success(RichEndChecker.isEnd(response.body.metaPhotos))
                                 }
                             }
                         }

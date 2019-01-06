@@ -14,19 +14,19 @@ import kotlinx.android.parcel.Parcelize
 )
 @Parcelize
 data class Photo(
-        @ColumnInfo(name = PHOTO_ID)
-        @PrimaryKey
-        val id: Long,
-        val title: String?,
-        @SerializedName("description")
-        @Embedded
-        val description: Description?,
-        @SerializedName("url_o")
-        val originImageUrl: String?,
-        @SerializedName("url_s")
-        val smallImageUrl: String?,
-        @SerializedName("lastupdate")
-        val lastUpdated: Long
+    @ColumnInfo(name = PHOTO_ID)
+    @PrimaryKey
+    val id: Long,
+    val title: String?,
+    @SerializedName("description")
+    @Embedded
+    val description: Description?,
+    @SerializedName("url_o")
+    val originImageUrl: String?,
+    @SerializedName("url_s")
+    val smallImageUrl: String?,
+    @SerializedName("datetaken")
+    val dateTaken: String?
 
 ) : Parcelable {
     companion object {
@@ -37,12 +37,12 @@ data class Photo(
 
 @Parcelize
 data class Description(
-        @SerializedName("_content")
-        val content: String
+    @SerializedName("_content")
+    val content: String
 ) : Parcelable
 
 fun Photo.getDescription(): String {
     return if (description?.content?.isEmpty() == true && title != null) title
-    else if (description?.content != null) description?.content
+    else if (description?.content != null) description.content
     else ""
 }

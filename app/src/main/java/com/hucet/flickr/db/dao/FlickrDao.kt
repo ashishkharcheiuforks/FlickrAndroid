@@ -1,8 +1,6 @@
 package com.hucet.flickr.db.dao
 
-import android.util.SparseIntArray
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Transformations
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -10,12 +8,11 @@ import androidx.room.Query
 import com.hucet.flickr.OpenForTesting
 import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.PhotoSearchResult
-import java.util.Collections
 
 @Dao
 @OpenForTesting
 abstract class FlickrDao {
-    @Query("SELECT * FROM photos WHERE photo_id in (:photoIds) ORDER BY lastUpdated DESC")
+    @Query("SELECT * FROM photos WHERE photo_id in (:photoIds) ORDER BY dateTaken DESC")
     abstract fun searchPhotosByIds(photoIds: List<Long>): LiveData<List<Photo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
