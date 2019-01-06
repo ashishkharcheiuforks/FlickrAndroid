@@ -1,3 +1,5 @@
 package com.hucet.flickr.testing
 
-class TestException(reason: String = "") : Throwable(reason)
+import java.lang.RuntimeException
+
+class TestException(reason: String = "") : RuntimeException(reason)

@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -12,9 +13,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hucet.flickr.AppPreference
 import com.hucet.flickr.R
-import com.hucet.flickr.api.ApiErrorResponse
-import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.databinding.FragmentFlickrSearchBinding
 import com.hucet.flickr.databinding.PhotoItemBinding
 import com.hucet.flickr.di.Injectable
@@ -23,13 +23,15 @@ import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
 import com.hucet.flickr.vo.Photo
+import com.hucet.flickr.vo.Status
 import kotlinx.android.synthetic.main.fragment_flickr_search.keywordRecyclerView
 import kotlinx.android.synthetic.main.fragment_flickr_search.photoRecyclerView
 import timber.log.Timber
 import javax.inject.Inject
 
-interface SearchNavigation {
-    fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo)
+interface SearchViewInterface {
+    fun navigateDetail(keyword: String, photoBinding: PhotoItemBinding, photo: Photo)
+    fun updateToolbarTitle(title: String)
 }
 
 class FlickrSearchFragment : Fragment(), Injectable {
@@ -40,6 +42,7 @@ class FlickrSearchFragment : Fragment(), Injectable {
     }
 
     private val keywords = listOf("Apple", "Banana", "Amazon", "Cat", "Dog", "Developer", "Style", "Share", "Tyler", "Good")
+    private var keyword: String = ""
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -58,10 +61,10 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
-    private var searchNavigator: SearchNavigation? = null
+    private var searchNavigator: SearchViewInterface? = null
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context is SearchNavigation)
+        if (context is SearchViewInterface)
             searchNavigator = context
         else
             throw TypeCastException("$context + must implement EnrollNavigation")
@@ -69,11 +72,11 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_flickr_search,
-            container,
-            false,
-            dataBindingComponent
+                inflater,
+                R.layout.fragment_flickr_search,
+                container,
+                false,
+                dataBindingComponent
         )
         return binding.root
     }
@@ -81,36 +84,51 @@ class FlickrSearchFragment : Fragment(), Injectable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.results.observe(this, Observer {
-            when (it) {
-                is ApiSuccessResponse -> {
-                    photoAdapter.submitList(it.body.photos.photo)
+
+            Timber.i("status: [${it.status}]\n" +
+                    "data: [${it.data?.size}]\n" +
+                    "error: [${it.message}]")
+            when {
+                it.status == Status.LOADING -> {
+                    showProgressBar()
                 }
-                is ApiErrorResponse -> {
-                    Timber.e(it.errorMessage)
+                it.data != null -> {
+                    hideProgressBar()
+                    photoAdapter.submitList(it.data)
+                }
+                it.message != null -> {
+                    hideProgressBar()
+                    AlertDialog.Builder(requireContext())
+                            .setTitle("오류")
+                            .setMessage(it.message)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show()
                 }
             }
         })
     }
 
+    override fun onPause() {
+        super.onPause()
+        AppPreference.saveKeyword(requireContext(), keyword)
+    }
+
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        keyword = AppPreference.getKeyword(requireContext()) ?: keywords.first()
         initKeywordRecyclerView()
         initPhotoAdapter()
     }
 
     private fun initKeywordRecyclerView() {
         keywordAdapter = KeywordAdapter(appExecutors) {
+            keyword = it
+            searchNavigator?.updateToolbarTitle(keyword)
             viewModel.search(it)
         }
         keywordRecyclerView.apply {
             adapter = keywordAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-        }
-        keywordRecyclerView.setRecyclerListener {
-            val imageView = (it as? PhotoItemBinding)?.photoImageView
-            imageView?.let {
-                GlideApp.with(this).clear(it)
-            }
         }
         keywordAdapter.submitList(keywords)
     }
@@ -123,10 +141,32 @@ class FlickrSearchFragment : Fragment(), Injectable {
             adapter = photoAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
-        viewModel.search(keywords.first())
+        photoRecyclerView.setRecyclerListener {
+            val imageView = (it as? PhotoItemBinding)?.photoImageView
+            imageView?.let {
+                GlideApp.with(this).clear(it)
+            }
+        }
+        photoRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastPosition = layoutManager.findLastVisibleItemPosition()
+                if (lastPosition == photoAdapter.itemCount - 1) {
+                    viewModel.loadNextPage()
+                }
+            }
+        })
+        viewModel.search(keyword)
+        searchNavigator?.updateToolbarTitle(keyword)
+    }
+
+    private fun hideProgressBar() {
+    }
+
+    private fun showProgressBar() {
     }
 
     private fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo) {
-        searchNavigator?.navigateDetail(photoBinding, photo)
+        searchNavigator?.navigateDetail(keyword, photoBinding, photo)
     }
 }

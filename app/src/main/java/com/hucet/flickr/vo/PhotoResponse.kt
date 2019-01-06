@@ -1,3 +1,8 @@
 package com.hucet.flickr.vo
 
-data class PhotoResponse(val photos: MetaPhoto)
+import com.google.gson.annotations.SerializedName
+
+data class PhotoResponse(
+    @SerializedName("photos")
+    val metaPhotos: MetaPhoto
+)

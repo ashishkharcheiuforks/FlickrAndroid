@@ -8,5 +8,6 @@ data class MetaPhoto(
     @SerializedName("perpage")
     val perPage: Int,
     val total: Int,
-    val photo: List<Photo>
+    @SerializedName("photo")
+    val photos: List<Photo>
 )

@@ -15,6 +15,7 @@ import com.hucet.flickr.utils.HTMLHelper
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
 import com.hucet.flickr.vo.Photo
+import com.hucet.flickr.vo.getDescription
 
 class FlickrDetailFragment : Fragment() {
     companion object {
@@ -48,6 +49,6 @@ class FlickrDetailFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         binding.photo = photo
-        binding.detailDesc.text = HTMLHelper.fromHtml(photo.description)
+        binding.detailDesc.text = HTMLHelper.fromHtml(photo.getDescription())
     }
 }

@@ -5,7 +5,6 @@ import androidx.databinding.BindingAdapter
 import androidx.fragment.app.Fragment
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions
 import com.hucet.flickr.OpenForTesting
-import com.hucet.flickr.R
 import com.hucet.flickr.glide.GlideApp
 import com.hucet.flickr.vo.Photo
 import timber.log.Timber
@@ -18,7 +17,6 @@ class FragmentBindingAdapters constructor(val fragment: Fragment) {
         GlideApp
                 .with(fragment)
                 .load(photo.originImageUrl)
-                .error(R.drawable.ic_glide_error)
                 .thumbnail(
                     GlideApp.with(fragment)
                             .load(photo.smallImageUrl)
