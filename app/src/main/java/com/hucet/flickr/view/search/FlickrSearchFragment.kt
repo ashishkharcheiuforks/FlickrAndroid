@@ -75,11 +75,11 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
-            inflater,
-            R.layout.fragment_flickr_search,
-            container,
-            false,
-            dataBindingComponent
+                inflater,
+                R.layout.fragment_flickr_search,
+                container,
+                false,
+                dataBindingComponent
         )
         return binding.root
     }
@@ -87,7 +87,11 @@ class FlickrSearchFragment : Fragment(), Injectable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.results.observe(this, Observer {
-            Timber.i("observer: ${it}")
+
+
+            Timber.i("status: [${it.status}]\n" +
+                    "data: [${it.data?.size}]\n" +
+                    "error: [${it.message}]")
             when {
                 it.status == Status.LOADING -> {
                     // TODO show progressbar
@@ -141,6 +145,15 @@ class FlickrSearchFragment : Fragment(), Injectable {
             adapter = photoAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
+        photoRecyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val layoutManager = recyclerView.layoutManager as LinearLayoutManager
+                val lastPosition = layoutManager.findLastVisibleItemPosition()
+                if (lastPosition == photoAdapter.itemCount - 1) {
+//                    viewModel.loadNextPage()
+                }
+            }
+        })
         viewModel.search(keyword)
         searchNavigator?.updateToolbarTitle(keyword)
     }

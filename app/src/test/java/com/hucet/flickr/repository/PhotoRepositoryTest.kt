@@ -13,20 +13,8 @@ import com.hucet.flickr.testing.InstantAppExecutors
 import com.hucet.flickr.testing.TestApplication
 import com.hucet.flickr.testing.TestException
 import com.hucet.flickr.testing.fixture.FlickrLoader
-import com.hucet.flickr.vo.Photo
-import com.hucet.flickr.vo.PhotoResponse
-import com.hucet.flickr.vo.Resource
-import com.hucet.flickr.vo.Status
-import com.nhaarman.mockito_kotlin.KArgumentCaptor
-import com.nhaarman.mockito_kotlin.any
-import com.nhaarman.mockito_kotlin.argumentCaptor
-import com.nhaarman.mockito_kotlin.doAnswer
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.eq
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.times
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.hucet.flickr.vo.*
+import com.nhaarman.mockito_kotlin.*
 import io.kotlintest.matchers.collections.shouldContainAll
 import io.kotlintest.shouldBe
 import org.junit.Before
@@ -38,7 +26,6 @@ import org.mockito.Mock
 import org.mockito.MockitoAnnotations
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
-import retrofit2.Call
 
 @RunWith(RobolectricTestRunner::class)
 @Config(sdk = [21], application = TestApplication::class)
@@ -66,12 +53,8 @@ class PhotoRepositoryTest {
         val (observer, captor) =
                 createPairObserverCaptor<Resource<List<Photo>>>()
 
-        val expectResponse = FlickrLoader.Paging.first()
         // given
-        val remoteLivedata = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-            value = ApiSuccessResponse(expectResponse)
-        }
-        remoteApi.stubSearchPhotos(null, remoteLivedata)
+        val expects = remoteApi.stubSuccessSearchPhotos(null).first()
 
         // when
         repository.searchPhotos("test").observeForever(observer)
@@ -79,9 +62,7 @@ class PhotoRepositoryTest {
 
         // then
         captor.firstValue shouldBe Resource.loading(null)
-        captor.secondValue.status shouldBe Status.SUCCESS
-        captor.secondValue.data?.size shouldBe expectResponse.metaPhotos.photos.size
-        captor.secondValue.data!! shouldContainAll expectResponse.metaPhotos.photos
+        captor.secondValue shouldBe Resource.success(expects.metaPhotos.photos)
     }
 
     @Test
@@ -102,25 +83,42 @@ class PhotoRepositoryTest {
     }
 
     @Test
-    fun `aaa`() {
-        val (observer, captor) =
-                createPairObserverCaptor<Resource<List<Photo>>>()
-        val (nextObserver, nextCaptor) =
-                createPairObserverCaptor<Resource<Boolean>>()
+    fun `Then increased a page when searchNextPhotos`() {
+        val keyword = "test"
+        val (searchResultObserver, searchResultCaptor) =
+                createPairObserverCaptor<PhotoSearchResult>()
+        // given
+        val expects = remoteApi.stubSuccessSearchPhotos(null)
+
+        cacheDB.flickrDao().searchResult(keyword).observeForever(searchResultObserver)
+
+        repository.searchPhotos(keyword).observeForever { }
+        repository.searchNextPhotos(keyword).observeForever { }
+
+        verify(searchResultObserver, times(3)).onChanged(searchResultCaptor.capture())
+        searchResultCaptor.firstValue shouldBe null
+        searchResultCaptor.secondValue shouldBe PhotoSearchResult(keyword, FlickrLoader.Paging.first().metaPhotos.photos.map { it.id }, 2)
+
+        val secondPhotoIds = expects[0].metaPhotos.photos.map { it.id } + expects[1].metaPhotos.photos.map { it.id }
+        searchResultCaptor.thirdValue shouldBe PhotoSearchResult(keyword, secondPhotoIds, 3)
+    }
+
+    @Test
+    fun `searchNextPhotos를 호출되면 Observer 가 통지 되어야 함`() {
+        val keyword = "test"
+
+        val expects = remoteApi.stubSuccessSearchPhotos(null)
 
         // given
-        val expectResponse = FlickrLoader.Paging.first()
-        val remoteLivedata = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-            value = ApiSuccessResponse(expectResponse)
-        }
-        with(remoteApi) {
-            stubSearchPhotos(null, remoteLivedata)
-        }
-        repository.searchPhotos("test").observeForever(observer)
-        verify(observer, times(2)).onChanged(captor.capture())
+        val (observer, captor) =
+                createPairObserverCaptor<Resource<List<Photo>>>()
+        repository.searchPhotos(keyword).observeForever(observer)
+        repository.searchNextPhotos(keyword).observeForever { }
 
-        repository.searchNextPhotos("test").observeForever(nextObserver)
-        println(captor.allValues)
+        verify(observer, times(3)).onChanged(captor.capture())
+        captor.firstValue shouldBe Resource.loading(null)
+        captor.secondValue shouldBe Resource.success(expects[0].metaPhotos.photos)
+        captor.lastValue shouldBe Resource.success(expects[0].metaPhotos.photos + expects[1].metaPhotos.photos)
     }
 }
 
@@ -130,19 +128,26 @@ inline fun <reified T> createPairObserverCaptor(): Pair<Observer<T>, KArgumentCa
     return observer to captor
 }
 
-fun FlickrApi.stubSearchPhotos(keyword: String?, expects: LiveData<ApiResponse<PhotoResponse>>, page: Int = 1) {
-    val secondLiveData = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-        value = ApiSuccessResponse(FlickrLoader.Paging.second())
+fun FlickrApi.stubSuccessSearchPhotos(keyword: String?): List<PhotoResponse> {
+    val firstData = FlickrLoader.Paging.first()
+    val firstLiveData = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
+        value = ApiSuccessResponse(firstData)
     }
+    val secondData = FlickrLoader.Paging.second()
+    val secondLiveData = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
+        value = ApiSuccessResponse(secondData)
+    }
+    val thirdData = FlickrLoader.Paging.third()
     val thirdLiveData = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-        value = ApiSuccessResponse(FlickrLoader.Paging.third())
+        value = ApiSuccessResponse(thirdData)
     }
 
     doAnswer {
         val page = it.arguments[1]
+
         when (page) {
             1 -> {
-                expects
+                firstLiveData
             }
             2 -> {
                 secondLiveData
@@ -150,11 +155,18 @@ fun FlickrApi.stubSearchPhotos(keyword: String?, expects: LiveData<ApiResponse<P
             else -> {
                 thirdLiveData
             }
-
         }
-        expects
     }.`when`(this).searchPhotos(
-        keyword ?: any(), eq(page) ?: any(),
-        any(), any(), any(), any(), any(), any(), any()
+            keyword ?: any(), any(),
+            any(), any(), any(), any(), any(), any(), any()
+    )
+    return listOf(firstData, secondData, thirdData)
+}
+
+
+fun FlickrApi.stubSearchPhotos(keyword: String?, expects: LiveData<ApiResponse<PhotoResponse>>) {
+    doReturn(expects).`when`(this).searchPhotos(
+            keyword ?: any(), any(),
+            any(), any(), any(), any(), any(), any(), any()
     )
 }

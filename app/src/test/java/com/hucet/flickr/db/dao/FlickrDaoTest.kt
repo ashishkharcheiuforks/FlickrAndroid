@@ -42,7 +42,7 @@ class FlickrDaoTest {
         val captor = argumentCaptor<List<Photo>>()
         val photos = FlickrLoader.Paging.first().metaPhotos.photos
         dao.insertPhotos(photos)
-        dao.getPhotosByIds(photos.map { it.id }).observeForever(observer)
+        dao.searchPhotosByIds(photos.map { it.id }).observeForever(observer)
 
         verify(observer).onChanged(captor.capture())
 

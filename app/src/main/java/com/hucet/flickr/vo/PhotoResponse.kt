@@ -5,6 +5,4 @@ import com.google.gson.annotations.SerializedName
 data class PhotoResponse(
     @SerializedName("photos")
     val metaPhotos: MetaPhoto
-) {
-    var nextPage: Int? = null
-}
+)

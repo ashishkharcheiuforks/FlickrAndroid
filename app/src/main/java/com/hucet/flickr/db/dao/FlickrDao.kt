@@ -15,8 +15,8 @@ import java.util.Collections
 @Dao
 @OpenForTesting
 abstract class FlickrDao {
-    @Query("SELECT * FROM photos WHERE photo_id in (:photoIds)")
-    abstract fun getPhotosByIds(photoIds: List<Long>): LiveData<List<Photo>>
+    @Query("SELECT * FROM photos WHERE photo_id in (:photoIds) ORDER BY lastUpdated DESC")
+    abstract fun searchPhotosByIds(photoIds: List<Long>): LiveData<List<Photo>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertPhotos(items: List<Photo>): List<Long>
@@ -27,6 +27,6 @@ abstract class FlickrDao {
     @Query("SELECT * FROM photo_search_results WHERE keyword = :keyword LIMIT 1")
     abstract fun searchResult(keyword: String): LiveData<PhotoSearchResult>
 
-    @Query("SELECT * FROM photo_search_results WHERE keyword = :keyword LIMIT 1")
+    @Query("SELECT * FROM photo_search_results WHERE keyword = :keyword  LIMIT 1")
     abstract fun unitSearchResult(keyword: String): PhotoSearchResult?
 }

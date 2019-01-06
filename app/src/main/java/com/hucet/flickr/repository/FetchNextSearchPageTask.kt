@@ -8,6 +8,7 @@ import com.hucet.flickr.api.ApiEmptyResponse
 import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiResponse
 import com.hucet.flickr.api.ApiSuccessResponse
+import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.PhotoResponse
 import com.hucet.flickr.vo.PhotoSearchResult
@@ -16,7 +17,9 @@ import com.hucet.flickr.vo.Resource
 /**
  * A task that reads the search result in the database and fetches the next page, if it has one.
  */
-abstract class FetchNextSearchPageTask {
+abstract class FetchNextSearchPageTask(
+        appExecutors: AppExecutors
+) {
     private val result = MediatorLiveData<Resource<Boolean>>()
 
     init {
@@ -43,15 +46,22 @@ abstract class FetchNextSearchPageTask {
                             ids.addAll(response.body.metaPhotos.photos.map { it.id })
 
                             val photoSearchResult = PhotoSearchResult(
-                                keyword = current.keyword,
-                                photoIds = ids,
-                                next = response.body.metaPhotos.page + 1
+                                    keyword = current.keyword,
+                                    photoIds = ids,
+                                    next = response.body.metaPhotos.page + 1
                             )
-                            savePhotosSearchResult(response.body.metaPhotos.photos, photoSearchResult)
+                            appExecutors.diskIO().execute {
+                                savePhotosSearchResult(response.body.metaPhotos.photos, photoSearchResult)
+                                appExecutors.mainThread().execute {
+                                    result.value = Resource.success(true)
+                                }
+                            }
                         }
                         is ApiErrorResponse -> {
+                            result.value = Resource.error(response.errorMessage, true)
                         }
                         is ApiEmptyResponse -> {
+                            result.value = Resource.success(false)
                         }
                     }
                 }

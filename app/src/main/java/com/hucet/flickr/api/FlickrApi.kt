@@ -20,7 +20,7 @@ interface FlickrApi {
             const val CONTENT_TYPE = "content_type"
             const val NO_JSON_CALLBACK = "nojsoncallback"
             const val PAGE = "page"
-            const val PER_PAGE = "perpage"
+            const val PER_PAGE = "per_page"
 
         }
 
@@ -29,7 +29,7 @@ interface FlickrApi {
             const val FORMAT = "json"
             const val EXTRAS = "description, url_o, url_s"
             const val NO_JSON_CALLBACK = 1
-            const val PER_PAGE = 10
+            const val PER_PAGE = 5
         }
     }
 

@@ -10,21 +10,24 @@ import com.hucet.flickr.vo.Photo.Companion.PHOTO_TABLE
 import kotlinx.android.parcel.Parcelize
 
 @Entity(
-    tableName = PHOTO_TABLE
+        tableName = PHOTO_TABLE
 )
 @Parcelize
 data class Photo(
-    @ColumnInfo(name = PHOTO_ID)
-    @PrimaryKey
-    val id: Long,
-    val title: String,
-    @SerializedName("description")
-    @Embedded
-    val description: Description,
-    @SerializedName("url_o")
-    val originImageUrl: String?,
-    @SerializedName("url_s")
-    val smallImageUrl: String?
+        @ColumnInfo(name = PHOTO_ID)
+        @PrimaryKey
+        val id: Long,
+        val title: String?,
+        @SerializedName("description")
+        @Embedded
+        val description: Description?,
+        @SerializedName("url_o")
+        val originImageUrl: String?,
+        @SerializedName("url_s")
+        val smallImageUrl: String?,
+        @SerializedName("lastupdate")
+        val lastUpdated: Long
+
 ) : Parcelable {
     companion object {
         const val PHOTO_TABLE = "photos"
@@ -34,11 +37,12 @@ data class Photo(
 
 @Parcelize
 data class Description(
-    @SerializedName("_content")
-    val content: String
+        @SerializedName("_content")
+        val content: String
 ) : Parcelable
 
 fun Photo.getDescription(): String {
-    return if (description.content.isEmpty()) title
-    else description.content
+    return if (description?.content?.isEmpty() == true && title != null) title
+    else if (description?.content != null) description?.content
+    else ""
 }

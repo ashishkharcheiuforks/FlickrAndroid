@@ -1,7 +1,6 @@
 package com.hucet.flickr.repository
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import com.hucet.flickr.OpenForTesting
 import com.hucet.flickr.api.ApiResponse
@@ -24,31 +23,21 @@ interface PhotoRepository {
     @Singleton
     @OpenForTesting
     class Impl @Inject constructor(
-        private val remoteApi: FlickrApi,
-        private val db: FlickrDatabase,
-        private val appExecutors: AppExecutors
+            private val remoteApi: FlickrApi,
+            private val db: FlickrDatabase,
+            private val appExecutors: AppExecutors
     ) : PhotoRepository {
         private val dao: FlickrDao = db.flickrDao()
-
-        private fun savePhotosSearchResult(photos: List<Photo>, photoSearchResult: PhotoSearchResult) {
-            db.beginTransaction()
-            try {
-                dao.insertPhotos(photos)
-                dao.insertSearchResult(photoSearchResult)
-                db.setTransactionSuccessful()
-            } finally {
-                db.endTransaction()
-            }
-        }
 
         override fun searchPhotos(keyword: String): LiveData<Resource<List<Photo>>> {
             return object : NetworkBoundResource<List<Photo>, PhotoResponse>(appExecutors) {
                 override fun saveCallResult(item: PhotoResponse) {
                     val photoIds = item.metaPhotos.photos.map { it.id }
+
                     val photoSearchResult = PhotoSearchResult(
-                        keyword = keyword,
-                        photoIds = photoIds,
-                        next = item.nextPage
+                            keyword = keyword,
+                            photoIds = photoIds,
+                            next = item.metaPhotos.page + 1
                     )
                     savePhotosSearchResult(item.metaPhotos.photos, photoSearchResult)
                 }
@@ -62,25 +51,19 @@ interface PhotoRepository {
                         if (searchData == null) {
                             AbsentLiveData.create()
                         } else {
-                            dao.getPhotosByIds(searchData.photoIds)
+                            dao.searchPhotosByIds(searchData.photoIds)
                         }
                     }
                 }
 
                 override fun createCall() = remoteApi.searchPhotos(keyword, 1)
-
-                override fun handleResponse(response: ApiSuccessResponse<PhotoResponse>): PhotoResponse {
-                    val body = response.body
-                    body.nextPage = body.metaPhotos.page + 1
-                    return body
-                }
             }.asLiveData()
         }
 
         override fun searchNextPhotos(keyword: String): LiveData<Resource<Boolean>> {
-            return object : FetchNextSearchPageTask() {
+            return object : FetchNextSearchPageTask(appExecutors) {
                 override fun savePhotosSearchResult(items: List<Photo>, searchResult: PhotoSearchResult) {
-                    savePhotosSearchResult(items, searchResult)
+                    this@Impl.savePhotosSearchResult(items, searchResult)
                 }
 
                 override fun searchResultFromDb(): LiveData<PhotoSearchResult> {
@@ -90,8 +73,18 @@ interface PhotoRepository {
                 override fun createCall(page: Int): LiveData<ApiResponse<PhotoResponse>> {
                     return remoteApi.searchPhotos(keyword, page)
                 }
-
             }.asLiveData()
+        }
+
+        private fun savePhotosSearchResult(photos: List<Photo>, photoSearchResult: PhotoSearchResult) {
+            db.beginTransaction()
+            try {
+                dao.insertPhotos(photos)
+                dao.insertSearchResult(photoSearchResult)
+                db.setTransactionSuccessful()
+            } finally {
+                db.endTransaction()
+            }
         }
     }
 }

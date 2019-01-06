@@ -15,7 +15,7 @@ import javax.inject.Inject
 
 @OpenForTesting
 class FlickrSearchViewModel @Inject constructor(
-    private val repository: PhotoRepository
+        private val repository: PhotoRepository
 ) : ViewModel() {
     private val searchKeyword = MutableLiveData<String>()
 
