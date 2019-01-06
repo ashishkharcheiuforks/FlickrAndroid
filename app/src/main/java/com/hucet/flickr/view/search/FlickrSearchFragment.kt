@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AlertDialog
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -24,6 +25,8 @@ import com.hucet.flickr.utils.AppExecutors
 import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
 import com.hucet.flickr.vo.Photo
+import com.hucet.flickr.vo.Resource
+import com.hucet.flickr.vo.Status
 import kotlinx.android.synthetic.main.fragment_flickr_search.keywordRecyclerView
 import kotlinx.android.synthetic.main.fragment_flickr_search.photoRecyclerView
 import timber.log.Timber
@@ -84,12 +87,19 @@ class FlickrSearchFragment : Fragment(), Injectable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.results.observe(this, Observer {
-            when (it) {
-                is ApiSuccessResponse -> {
-                    photoAdapter.submitList(it.body.photos.photo)
+            when {
+                it.status == Status.LOADING -> {
+                    // TODO show progressbar
                 }
-                is ApiErrorResponse -> {
-                    Timber.e(it.errorMessage)
+                it.data != null -> {
+                    photoAdapter.submitList(it.data)
+                }
+                it.message != null -> {
+                    AlertDialog.Builder(requireContext())
+                            .setTitle("오류")
+                            .setMessage(it.message)
+                            .setPositiveButton(android.R.string.ok, null)
+                            .show()
                 }
             }
         })

@@ -1,6 +1,7 @@
 package com.hucet.flickr.api
 
 import retrofit2.Response
+import timber.log.Timber
 
 sealed class ApiResponse<T> {
     companion object {
@@ -23,6 +24,7 @@ sealed class ApiResponse<T> {
                 } else {
                     msg
                 }
+                Timber.e(errorMsg)
                 ApiErrorResponse(errorMsg ?: "unknown error")
             }
         }
@@ -34,8 +36,6 @@ sealed class ApiResponse<T> {
  */
 class ApiEmptyResponse<T> : ApiResponse<T>()
 
-data class ApiSuccessResponse<T>(
-    val body: T
-) : ApiResponse<T>()
+data class ApiSuccessResponse<T>(val body: T) : ApiResponse<T>()
 
 data class ApiErrorResponse<T>(val errorMessage: String) : ApiResponse<T>()

@@ -18,6 +18,9 @@ interface FlickrApi {
             const val FORMAT = "format"
             const val CONTENT_TYPE = "content_type"
             const val NO_JSON_CALLBACK = "nojsoncallback"
+            const val PAGE = "page"
+            const val PER_PAGE = "perpage"
+
         }
 
         object QueryValue {
@@ -25,6 +28,7 @@ interface FlickrApi {
             const val FORMAT = "json"
             const val EXTRAS = "description, url_o, url_s"
             const val NO_JSON_CALLBACK = 1
+            const val PER_PAGE = 10
         }
     }
 
@@ -32,6 +36,8 @@ interface FlickrApi {
     @GET(SEARCH_PATH)
     fun getPhotos(
         @Query(QueryKey.TEXT) text: String,
+        @Query(QueryKey.PAGE) page: Int = 1,
+        @Query(QueryKey.PER_PAGE) perPage: Int = QueryValue.PER_PAGE,
         @Query(QueryKey.EXTRAS) extras: String = QueryValue.EXTRAS,
         @Query(QueryKey.METHOD) method: String = QueryValue.METHOD,
         @Query(QueryKey.API_KEY) apiKey: String = BuildConfig.API_KEY,
