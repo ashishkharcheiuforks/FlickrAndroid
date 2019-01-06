@@ -12,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.hucet.flickr.ArgKey
 import com.hucet.flickr.R
 import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiSuccessResponse
@@ -28,8 +29,9 @@ import kotlinx.android.synthetic.main.fragment_flickr_search.photoRecyclerView
 import timber.log.Timber
 import javax.inject.Inject
 
-interface SearchNavigation {
+interface SearchViewInterface {
     fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo)
+    fun updateToolbarTitle(title: String)
 }
 
 class FlickrSearchFragment : Fragment(), Injectable {
@@ -40,6 +42,7 @@ class FlickrSearchFragment : Fragment(), Injectable {
     }
 
     private val keywords = listOf("Apple", "Banana", "Amazon", "Cat", "Dog", "Developer", "Style", "Share", "Tyler", "Good")
+    private var keyword: String = ""
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
@@ -58,10 +61,10 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     var dataBindingComponent: DataBindingComponent = FragmentDataBindingComponent(this)
 
-    private var searchNavigator: SearchNavigation? = null
+    private var searchNavigator: SearchViewInterface? = null
     override fun onAttach(context: Context?) {
         super.onAttach(context)
-        if (context is SearchNavigation)
+        if (context is SearchViewInterface)
             searchNavigator = context
         else
             throw TypeCastException("$context + must implement EnrollNavigation")
@@ -94,13 +97,17 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
+        keyword = savedInstanceState?.getString(ArgKey.Keyword.name) ?: keywords.first()
         initKeywordRecyclerView()
         initPhotoAdapter()
     }
 
     private fun initKeywordRecyclerView() {
         keywordAdapter = KeywordAdapter(appExecutors) {
+            keyword = it
+            searchNavigator?.updateToolbarTitle(keyword)
             viewModel.search(it)
+
         }
         keywordRecyclerView.apply {
             adapter = keywordAdapter
@@ -123,7 +130,14 @@ class FlickrSearchFragment : Fragment(), Injectable {
             adapter = photoAdapter
             layoutManager = LinearLayoutManager(requireContext(), RecyclerView.VERTICAL, false)
         }
-        viewModel.search(keywords.first())
+        viewModel.search(keyword)
+        searchNavigator?.updateToolbarTitle(keyword)
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        if (!keyword.isEmpty())
+            outState.putString(ArgKey.Keyword.name, keyword)
+        super.onSaveInstanceState(outState)
     }
 
     private fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo) {
