@@ -22,9 +22,9 @@ data class Photo(
     @Embedded
     val description: Description,
     @SerializedName("url_o")
-    val originImageUrl: String,
+    val originImageUrl: String?,
     @SerializedName("url_s")
-    val smallImageUrl: String
+    val smallImageUrl: String?
 ) : Parcelable {
     companion object {
         const val PHOTO_TABLE = "photos"

@@ -24,6 +24,9 @@ abstract class FlickrDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun insertSearchResult(photoSearchResult: PhotoSearchResult)
 
-    @Query("SELECT * FROM photo_search_results WHERE keyword = :keyword")
+    @Query("SELECT * FROM photo_search_results WHERE keyword = :keyword LIMIT 1")
     abstract fun searchResult(keyword: String): LiveData<PhotoSearchResult>
+
+    @Query("SELECT * FROM photo_search_results WHERE keyword = :keyword LIMIT 1")
+    abstract fun unitSearchResult(keyword: String): PhotoSearchResult?
 }

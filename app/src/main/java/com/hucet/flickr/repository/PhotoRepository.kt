@@ -1,8 +1,10 @@
 package com.hucet.flickr.repository
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.Transformations
 import com.hucet.flickr.OpenForTesting
+import com.hucet.flickr.api.ApiResponse
 import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.api.FlickrApi
 import com.hucet.flickr.db.FlickrDatabase
@@ -18,7 +20,7 @@ import javax.inject.Singleton
 
 interface PhotoRepository {
     fun searchPhotos(keyword: String): LiveData<Resource<List<Photo>>>
-    fun searchNextPhotos(keyword: String): LiveData<Resource<List<Photo>>>
+    fun searchNextPhotos(keyword: String): LiveData<Resource<Boolean>>
     @Singleton
     @OpenForTesting
     class Impl @Inject constructor(
@@ -28,10 +30,19 @@ interface PhotoRepository {
     ) : PhotoRepository {
         private val dao: FlickrDao = db.flickrDao()
 
-        override fun searchPhotos(keyword: String): LiveData<Resource<List<Photo>>> {
-            // 네트워크를 통해 가져온다.
-            return object : NetworkBoundResource<List<Photo>, PhotoResponse>(appExecutors) {
+        private fun savePhotosSearchResult(photos: List<Photo>, photoSearchResult: PhotoSearchResult) {
+            db.beginTransaction()
+            try {
+                dao.insertPhotos(photos)
+                dao.insertSearchResult(photoSearchResult)
+                db.setTransactionSuccessful()
+            } finally {
+                db.endTransaction()
+            }
+        }
 
+        override fun searchPhotos(keyword: String): LiveData<Resource<List<Photo>>> {
+            return object : NetworkBoundResource<List<Photo>, PhotoResponse>(appExecutors) {
                 override fun saveCallResult(item: PhotoResponse) {
                     val photoIds = item.metaPhotos.photos.map { it.id }
                     val photoSearchResult = PhotoSearchResult(
@@ -39,19 +50,10 @@ interface PhotoRepository {
                         photoIds = photoIds,
                         next = item.nextPage
                     )
-                    db.beginTransaction()
-                    try {
-                        dao.insertPhotos(item.metaPhotos.photos)
-                        dao.insertSearchResult(photoSearchResult)
-                        db.setTransactionSuccessful()
-                    } finally {
-                        db.endTransaction()
-                    }
+                    savePhotosSearchResult(item.metaPhotos.photos, photoSearchResult)
                 }
 
                 override fun shouldFetch(data: List<Photo>?): Boolean {
-                    // 생성된 시간이 10분 초과되면 ture 반환
-                    // 가져온 데이터가 없는 경우 true 반환
                     return data == null
                 }
 
@@ -65,7 +67,7 @@ interface PhotoRepository {
                     }
                 }
 
-                override fun createCall() = remoteApi.getPhotos(keyword)
+                override fun createCall() = remoteApi.searchPhotos(keyword, 1)
 
                 override fun handleResponse(response: ApiSuccessResponse<PhotoResponse>): PhotoResponse {
                     val body = response.body
@@ -75,16 +77,21 @@ interface PhotoRepository {
             }.asLiveData()
         }
 
-        override fun searchNextPhotos(keyword: String): LiveData<Resource<List<Photo>>> {
-            // 1. cache로 부터 next page 를 가져온다.
-            // 검색된 결과가 없는 경우 네트워크를 통해 가져온다.
-            // 2. shouldFetch() 에서 true를 반환하면 네트워크를 통해 가져온다.
-            // false를 반환하면 cache로 부터 가져온다.
+        override fun searchNextPhotos(keyword: String): LiveData<Resource<Boolean>> {
+            return object : FetchNextSearchPageTask() {
+                override fun savePhotosSearchResult(items: List<Photo>, searchResult: PhotoSearchResult) {
+                    savePhotosSearchResult(items, searchResult)
+                }
 
-            // handle responses
-            // 1. 네트워크로 부터 가져온 데이터는 cache에 저장한다.
-            // 2. cache에 search query를 통해 데이터를 가져온다.
-            TODO("")
+                override fun searchResultFromDb(): LiveData<PhotoSearchResult> {
+                    return dao.searchResult(keyword)
+                }
+
+                override fun createCall(page: Int): LiveData<ApiResponse<PhotoResponse>> {
+                    return remoteApi.searchPhotos(keyword, page)
+                }
+
+            }.asLiveData()
         }
     }
 }

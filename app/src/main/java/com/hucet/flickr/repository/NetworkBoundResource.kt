@@ -20,11 +20,14 @@ import androidx.annotation.MainThread
 import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.Transformations
 import com.hucet.flickr.api.ApiEmptyResponse
 import com.hucet.flickr.api.ApiErrorResponse
 import com.hucet.flickr.api.ApiResponse
 import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.utils.AppExecutors
+import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.Resource
 
 /**
@@ -40,13 +43,12 @@ abstract class NetworkBoundResource<ResultType, RequestType>
 @MainThread constructor(private val appExecutors: AppExecutors) {
 
     private val result = MediatorLiveData<Resource<ResultType>>()
-
     init {
-        result.value = Resource.loading(null)
         val dbSource = loadFromDb()
-        result.addSource(dbSource) { data ->
+        result.addSource(dbSource) { loadedFromDb ->
+            result.value = Resource.loading(null)
             result.removeSource(dbSource)
-            if (shouldFetch(data)) {
+            if (shouldFetch(loadedFromDb)) {
                 fetchFromNetwork(dbSource)
             } else {
                 result.addSource(dbSource) { newData ->

@@ -87,6 +87,7 @@ class FlickrSearchFragment : Fragment(), Injectable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.results.observe(this, Observer {
+            Timber.i("observer: ${it}")
             when {
                 it.status == Status.LOADING -> {
                     // TODO show progressbar

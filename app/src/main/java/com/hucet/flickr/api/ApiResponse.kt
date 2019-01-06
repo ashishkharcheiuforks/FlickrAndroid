@@ -5,10 +5,12 @@ import timber.log.Timber
 
 sealed class ApiResponse<T> {
     companion object {
+        @JvmStatic
         fun <T> create(error: Throwable): ApiErrorResponse<T> {
             return ApiErrorResponse(error.message ?: "unknown error")
         }
 
+        @JvmStatic
         fun <T> create(response: Response<T>): ApiResponse<T> {
             return if (response.isSuccessful) {
                 val body = response.body()

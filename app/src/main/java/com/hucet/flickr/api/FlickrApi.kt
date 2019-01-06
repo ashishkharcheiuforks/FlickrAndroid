@@ -3,6 +3,7 @@ package com.hucet.flickr.api
 import androidx.lifecycle.LiveData
 import com.hucet.flickr.BuildConfig
 import com.hucet.flickr.vo.PhotoResponse
+import retrofit2.Call
 import retrofit2.http.GET
 import retrofit2.http.Query
 
@@ -32,11 +33,10 @@ interface FlickrApi {
         }
     }
 
-
     @GET(SEARCH_PATH)
-    fun getPhotos(
+    fun searchPhotos(
         @Query(QueryKey.TEXT) text: String,
-        @Query(QueryKey.PAGE) page: Int = 1,
+        @Query(QueryKey.PAGE) page: Int,
         @Query(QueryKey.PER_PAGE) perPage: Int = QueryValue.PER_PAGE,
         @Query(QueryKey.EXTRAS) extras: String = QueryValue.EXTRAS,
         @Query(QueryKey.METHOD) method: String = QueryValue.METHOD,
