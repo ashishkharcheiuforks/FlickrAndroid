@@ -5,7 +5,7 @@ import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.AsyncDifferConfig
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
-import com.hucet.flickr.testing.AppExecutors
+import com.hucet.flickr.utils.AppExecutors
 
 /**
  * A generic RecyclerView adapter that uses Data Binding & DiffUtil.
@@ -29,9 +29,9 @@ abstract class DataBoundListAdapter<T, V : ViewDataBinding>(
     protected abstract fun createBinding(parent: ViewGroup, viewType: Int): V
 
     override fun onBindViewHolder(holder: DataBoundViewHolder<V>, position: Int) {
-        bind(holder.binding, getItem(position))
+        bind(holder.binding, getItem(position), position)
         holder.binding.executePendingBindings()
     }
 
-    protected abstract fun bind(binding: V, item: T)
+    protected abstract fun bind(binding: V, item: T, position: Int)
 }

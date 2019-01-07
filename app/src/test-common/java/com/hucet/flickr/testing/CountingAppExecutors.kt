@@ -16,6 +16,7 @@
 
 package com.hucet.flickr.testing
 
+import com.hucet.flickr.utils.AppExecutors
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.TimeUnit
@@ -49,9 +50,9 @@ class CountingAppExecutors(idleCallback: (() -> Unit)? = null) {
             }
         }
         appExecutors = AppExecutors(
-            CountingExecutor(increment, decrement),
-            CountingExecutor(increment, decrement),
-            CountingExecutor(increment, decrement)
+                CountingExecutor(increment, decrement),
+                CountingExecutor(increment, decrement),
+                CountingExecutor(increment, decrement)
         )
     }
 

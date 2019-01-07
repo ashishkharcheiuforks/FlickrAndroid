@@ -1,4 +1,4 @@
-package com.hucet.flickr.testing
+package com.hucet.flickr.utils
 
 import android.os.Handler
 import android.os.Looper
@@ -18,7 +18,7 @@ open class AppExecutors(
     constructor() : this(
         Executors.newSingleThreadExecutor(),
         Executors.newFixedThreadPool(3),
-        MainThreadExecutor()
+            MainThreadExecutor()
     )
 
     fun diskIO(): Executor = diskIO
