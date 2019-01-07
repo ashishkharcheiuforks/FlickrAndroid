@@ -41,10 +41,6 @@ interface PhotoRepository {
                     savePhotosSearchResult(item.metaPhotos.photos, photoSearchResult)
                 }
 
-                override fun shouldFetch(data: List<Photo>?): Boolean {
-                    return data == null
-                }
-
                 override fun loadFromDb(): LiveData<List<Photo>> {
                     return Transformations.switchMap(dao.searchResult(keyword)) { searchData ->
                         if (searchData == null) {
@@ -55,7 +51,8 @@ interface PhotoRepository {
                     }
                 }
 
-                override fun createCall() = remoteApi.searchPhotos(keyword, 1)
+                override fun createCall(): LiveData<ApiResponse<PhotoResponse>> =
+                        remoteApi.searchPhotos(keyword, 1)
             }.asLiveData()
         }
 

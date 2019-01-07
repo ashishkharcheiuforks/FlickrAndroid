@@ -54,7 +54,7 @@ abstract class FetchNextSearchPageTask(
                             appExecutors.diskIO().execute {
                                 savePhotosSearchResult(response.body.metaPhotos.photos, photoSearchResult)
                                 appExecutors.mainThread().execute {
-                                    result.value = Resource.success(RichEndChecker.isEnd(response.body.metaPhotos))
+                                    result.value = Resource.success(!RichEndChecker.isEnd(response.body.metaPhotos))
                                 }
                             }
                         }

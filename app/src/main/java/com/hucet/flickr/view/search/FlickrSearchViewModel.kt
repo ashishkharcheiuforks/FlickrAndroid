@@ -21,6 +21,9 @@ class FlickrSearchViewModel @Inject constructor(
     private val searchKeyword = MutableLiveData<String>()
     private val nextPageHandler = NextPageHandler(repository)
 
+    val loadMoreState: LiveData<LoadMoreState>
+        get() = nextPageHandler.loadMoreState
+
     val results: LiveData<Resource<List<Photo>>> = Transformations
             .switchMap(searchKeyword) { search ->
                 if (search.isNullOrBlank()) {
@@ -33,6 +36,7 @@ class FlickrSearchViewModel @Inject constructor(
     fun search(keyword: String) {
         if (keyword.isEmpty() || keyword == searchKeyword.value)
             return
+        nextPageHandler.reset()
         searchKeyword.value = keyword
     }
 
@@ -116,7 +120,7 @@ class FlickrSearchViewModel @Inject constructor(
 
         private fun isRunning(keyword: String): Boolean = this.query == keyword
 
-        private fun reset() {
+        fun reset() {
             unregister()
             _hasMore = true
             loadMoreState.value = LoadMoreState(

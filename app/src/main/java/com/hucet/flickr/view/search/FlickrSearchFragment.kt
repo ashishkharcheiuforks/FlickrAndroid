@@ -88,7 +88,6 @@ class FlickrSearchFragment : Fragment(), Injectable {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel.results.observe(this, Observer {
-
             Timber.i("status: [${it.status}]\ndata: [${it.data?.size}]\nerror: [${it.message}]")
             when {
                 it.status == Status.LOADING -> {
@@ -107,6 +106,9 @@ class FlickrSearchFragment : Fragment(), Injectable {
                             .show()
                 }
             }
+        })
+        viewModel.loadMoreState.observe(this, Observer {
+            println("!!!!!!!!!!!!! loadMore $it")
         })
     }
 

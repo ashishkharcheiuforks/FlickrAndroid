@@ -8,7 +8,7 @@ apply plugin: 'kotlin-allopen'
 apply from: "$project.rootDir/script/static-analysis.gradle"
 apply from: "$project.rootDir/script/jacoco.gradle"
 apply from: "env.gradle"
-//apply from: 'signing.gradle'
+apply from: 'signing.gradle'
 apply plugin: 'project-report'
 
 allOpen {
@@ -35,7 +35,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-//            signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }

@@ -3,8 +3,12 @@ package com.hucet.flickr.view.search
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.hucet.flickr.api.ApiResponse
+import com.hucet.flickr.api.ApiSuccessResponse
 import com.hucet.flickr.repository.PhotoRepository
 import com.hucet.flickr.testing.TestApplication
+import com.hucet.flickr.testing.fixture.FlickrLoader
+import com.hucet.flickr.vo.PhotoResponse
 import com.hucet.flickr.vo.Resource
 import com.nhaarman.mockito_kotlin.any
 import com.nhaarman.mockito_kotlin.doReturn
@@ -32,10 +36,26 @@ class NextPageHandlerTest {
     }
 
     @Test
-    fun `hasMore Test Cases`() {
+    fun `hasMore (false) Test Cases`() {
         assertHasMore(Resource.success(null), false)
+    }
+
+    @Test
+    fun `hasMore (true) Test Cases`() {
         assertHasMore(Resource.success(true), true)
         assertHasMore(Resource.error("error", null), true)
+    }
+
+    @Test
+    fun `refresh`() {
+        val first = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
+            value = ApiSuccessResponse(FlickrLoader.Paging.first())
+        }
+        val second = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
+            value = ApiSuccessResponse(FlickrLoader.Paging.second())
+        }
+        doReturn(first).`when`(repository).searchPhotos(any())
+        doReturn(second).`when`(repository).searchPhotos(any())
     }
 
     private fun assertHasMore(onChangedValue: Resource<Boolean>, expect: Boolean) {

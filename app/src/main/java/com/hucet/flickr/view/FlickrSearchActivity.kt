@@ -117,7 +117,6 @@ class FlickrSearchActivity : AppCompatActivity(), HasSupportFragmentInjector, Se
             keywordRecyclerView.show(isPort())
     }
 
-
     override fun onSaveInstanceState(outState: Bundle?) {
         outState?.putString(ArgKey.Keyword.name, keyword)
         super.onSaveInstanceState(outState)

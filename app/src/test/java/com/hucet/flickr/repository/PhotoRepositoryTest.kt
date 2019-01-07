@@ -73,7 +73,7 @@ class PhotoRepositoryTest {
                 createPairObserverCaptor<Resource<List<Photo>>>()
         // given
         val remoteLivedata = MutableLiveData<ApiResponse<PhotoResponse>>().apply {
-            value = ApiResponse.create(TestException("test"))
+            value = ApiResponse.create(error = TestException("test"))
         }
         remoteApi.stubSearchPhotos(null, remoteLivedata)
 
