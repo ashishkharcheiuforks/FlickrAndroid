@@ -47,7 +47,7 @@ abstract class FlickrDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context): FlickrDatabase {
             return Room.databaseBuilder(
                 context,
-                FlickrDatabase::class.java, "flickr12"
+                FlickrDatabase::class.java, "flickr13"
             )
                 .populate()
                 .build()

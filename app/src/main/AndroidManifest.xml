@@ -9,7 +9,8 @@
  a disconnected to a connected network state.
  -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
     <application
             android:name=".MyApplication"
             android:allowBackup="false"
@@ -19,7 +20,9 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name=".view.FlickrSearchActivity">
+        <activity
+                android:name=".view.FlickrSearchActivity"
+                android:configChanges="screenSize|orientation">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <action android:name="android.intent.action.VIEW" />

@@ -27,11 +27,10 @@ abstract class FetchNextSearchPageTask(
         val searchResultDb = searchResultFromDb()
         result.addSource(searchResultDb) { searchResultLoadedFromDB ->
             result.removeSource(searchResultDb)
-            val current = searchResultLoadedFromDB
-            if (current == null) {
+            if (searchResultLoadedFromDB == null) {
                 result.postValue(null)
             }
-            val nextPage = current?.next
+            val nextPage = searchResultLoadedFromDB?.next
             if (nextPage == null) {
                 result.postValue(Resource.success(false))
             } else {
@@ -42,15 +41,15 @@ abstract class FetchNextSearchPageTask(
                     when (response) {
                         is ApiSuccessResponse -> {
                             val ids = arrayListOf<Long>().apply {
-                                addAll(current.photoIds)
+                                addAll(searchResultLoadedFromDB.photoIds)
 
                                 addAll(response.body.metaPhotos.photos.map { it.id })
                             }
 
                             val photoSearchResult = PhotoSearchResult(
-                                    keyword = current.keyword,
-                                    photoIds = ids,
-                                    next = response.body.metaPhotos.page + 1
+                                keyword = searchResultLoadedFromDB.keyword,
+                                photoIds = ids,
+                                next = response.body.metaPhotos.page + 1
                             )
                             appExecutors.diskIO().execute {
                                 savePhotosSearchResult(response.body.metaPhotos.photos, photoSearchResult)
