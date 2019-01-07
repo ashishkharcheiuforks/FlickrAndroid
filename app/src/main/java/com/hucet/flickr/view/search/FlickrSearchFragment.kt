@@ -26,6 +26,7 @@ import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.Status
 import kotlinx.android.synthetic.main.fragment_flickr_search.keywordRecyclerView
 import kotlinx.android.synthetic.main.fragment_flickr_search.photoRecyclerView
+import kotlinx.android.synthetic.main.fragment_flickr_search.progressBar
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -161,12 +162,21 @@ class FlickrSearchFragment : Fragment(), Injectable {
     }
 
     private fun hideProgressBar() {
+        progressBar.show(false)
     }
 
     private fun showProgressBar() {
+        progressBar.show(true)
     }
 
     private fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo) {
         searchNavigator?.navigateDetail(keyword, photoBinding, photo)
     }
+}
+
+fun View.show(isShow: Boolean) {
+    if (isShow)
+        visibility = View.VISIBLE
+    else
+        visibility = View.GONE
 }
