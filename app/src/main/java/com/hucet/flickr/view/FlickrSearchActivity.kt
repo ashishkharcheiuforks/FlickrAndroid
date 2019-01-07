@@ -1,5 +1,7 @@
 package com.hucet.flickr.view
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.transition.Fade
 import android.transition.TransitionInflater
@@ -18,6 +20,7 @@ import com.hucet.flickr.view.detail.FlickrDetailFragment
 import com.hucet.flickr.view.search.FlickrSearchFragment
 import com.hucet.flickr.view.search.KeywordAdapter
 import com.hucet.flickr.view.search.SearchViewInterface
+import com.hucet.flickr.view.search.show
 import com.hucet.flickr.vo.Photo
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.HasSupportFragmentInjector
@@ -98,12 +101,23 @@ class FlickrSearchActivity : AppCompatActivity(), HasSupportFragmentInjector, Se
         keywordRecyclerView.visibility = View.GONE
     }
 
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+        setVisibleKeywordListView()
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
+        setVisibleKeywordListView()
+    }
+
+    private fun setVisibleKeywordListView() {
         val searchFragment = supportFragmentManager.findFragmentById(containerIdRes) as? FlickrSearchFragment
         if (searchFragment != null)
-            keywordRecyclerView.visibility = View.VISIBLE
+            keywordRecyclerView.show(isPort())
     }
+
+
     override fun onSaveInstanceState(outState: Bundle?) {
         outState?.putString(ArgKey.Keyword.name, keyword)
         super.onSaveInstanceState(outState)
@@ -111,3 +125,7 @@ class FlickrSearchActivity : AppCompatActivity(), HasSupportFragmentInjector, Se
 
     override fun supportFragmentInjector() = dispatchingAndroidInjector
 }
+
+fun Configuration.isPort(): Boolean = orientation == Configuration.ORIENTATION_PORTRAIT
+fun Context.isPort(): Boolean =
+        resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT

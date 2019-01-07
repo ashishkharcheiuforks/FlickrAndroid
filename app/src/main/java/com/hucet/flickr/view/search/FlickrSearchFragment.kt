@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -13,7 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hucet.flickr.AppPreference
+import com.hucet.flickr.ArgKey
 import com.hucet.flickr.R
 import com.hucet.flickr.databinding.FragmentFlickrSearchBinding
 import com.hucet.flickr.databinding.PhotoItemBinding
@@ -24,8 +25,9 @@ import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
 import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.Status
-import kotlinx.android.synthetic.main.fragment_flickr_search.keywordRecyclerView
 import kotlinx.android.synthetic.main.fragment_flickr_search.photoRecyclerView
+import kotlinx.android.synthetic.main.fragment_flickr_search.progressBar
+import kotlinx.android.synthetic.main.fragment_flickr_search.swipeRefresh
 import timber.log.Timber
 import javax.inject.Inject
 
