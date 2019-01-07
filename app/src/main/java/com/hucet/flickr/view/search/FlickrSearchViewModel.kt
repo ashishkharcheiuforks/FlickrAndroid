@@ -36,6 +36,12 @@ class FlickrSearchViewModel @Inject constructor(
         searchKeyword.value = keyword
     }
 
+    fun refresh() {
+        searchKeyword.value?.let {
+            searchKeyword.value = it
+        }
+    }
+
     fun loadNextPage() {
         searchKeyword.value?.let {
             if (it.isNotBlank()) {
@@ -67,8 +73,8 @@ class FlickrSearchViewModel @Inject constructor(
             this.query = keyword
             nextPageLiveData = repository.searchNextPhotos(keyword)
             loadMoreState.value = LoadMoreState(
-                    isRunning = true,
-                    errorMessage = null
+                isRunning = true,
+                errorMessage = null
             )
             nextPageLiveData?.observeForever(this)
         }
@@ -82,20 +88,20 @@ class FlickrSearchViewModel @Inject constructor(
                         _hasMore = result.data == true
                         unregister()
                         loadMoreState.setValue(
-                                LoadMoreState(
-                                        isRunning = false,
-                                        errorMessage = null
-                                )
+                            LoadMoreState(
+                                isRunning = false,
+                                errorMessage = null
+                            )
                         )
                     }
                     Status.ERROR -> {
                         _hasMore = true
                         unregister()
                         loadMoreState.setValue(
-                                LoadMoreState(
-                                        isRunning = false,
-                                        errorMessage = result.message
-                                )
+                            LoadMoreState(
+                                isRunning = false,
+                                errorMessage = result.message
+                            )
                         )
                     }
                     Status.LOADING -> {
@@ -114,8 +120,8 @@ class FlickrSearchViewModel @Inject constructor(
             unregister()
             _hasMore = true
             loadMoreState.value = LoadMoreState(
-                    isRunning = false,
-                    errorMessage = null
+                isRunning = false,
+                errorMessage = null
             )
         }
 

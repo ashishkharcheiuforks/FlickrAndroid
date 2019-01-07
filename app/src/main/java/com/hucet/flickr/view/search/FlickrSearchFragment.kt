@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.os.bundleOf
 import androidx.databinding.DataBindingComponent
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
@@ -13,7 +14,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.hucet.flickr.AppPreference
+import com.hucet.flickr.ArgKey
 import com.hucet.flickr.R
 import com.hucet.flickr.databinding.FragmentFlickrSearchBinding
 import com.hucet.flickr.databinding.PhotoItemBinding
@@ -24,32 +25,32 @@ import com.hucet.flickr.utils.autoCleared
 import com.hucet.flickr.view.common.databinding.FragmentDataBindingComponent
 import com.hucet.flickr.vo.Photo
 import com.hucet.flickr.vo.Status
-import kotlinx.android.synthetic.main.fragment_flickr_search.keywordRecyclerView
 import kotlinx.android.synthetic.main.fragment_flickr_search.photoRecyclerView
+import kotlinx.android.synthetic.main.fragment_flickr_search.swipeRefresh
 import timber.log.Timber
 import javax.inject.Inject
 
 interface SearchViewInterface {
-    fun navigateDetail(keyword: String, photoBinding: PhotoItemBinding, photo: Photo)
-    fun updateToolbarTitle(title: String)
+    fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo)
 }
 
 class FlickrSearchFragment : Fragment(), Injectable {
     companion object {
-        fun newInstance(): FlickrSearchFragment {
-            return FlickrSearchFragment()
+        fun newInstance(keyword: String): FlickrSearchFragment {
+            return FlickrSearchFragment().apply {
+                arguments = bundleOf(ArgKey.Keyword.name to keyword)
+            }
         }
     }
 
-    private val keywords = listOf("Apple", "Banana", "Amazon", "Cat", "Dog", "Developer", "Style", "Share", "Tyler", "Good")
-    private var keyword: String = ""
+    private val keyword by lazy {
+        arguments?.getString(ArgKey.Keyword.name)
+    }
     @Inject
     lateinit var viewModelFactory: ViewModelProvider.Factory
 
     @Inject
     lateinit var appExecutors: AppExecutors
-
-    var keywordAdapter by autoCleared<KeywordAdapter>()
 
     var photoAdapter by autoCleared<PhotoAdapter>()
 
@@ -72,11 +73,11 @@ class FlickrSearchFragment : Fragment(), Injectable {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = DataBindingUtil.inflate(
-                inflater,
-                R.layout.fragment_flickr_search,
-                container,
-                false,
-                dataBindingComponent
+            inflater,
+            R.layout.fragment_flickr_search,
+            container,
+            false,
+            dataBindingComponent
         )
         return binding.root
     }
@@ -85,9 +86,7 @@ class FlickrSearchFragment : Fragment(), Injectable {
         super.onViewCreated(view, savedInstanceState)
         viewModel.results.observe(this, Observer {
 
-            Timber.i("status: [${it.status}]\n" +
-                    "data: [${it.data?.size}]\n" +
-                    "error: [${it.message}]")
+            Timber.i("status: [${it.status}]\ndata: [${it.data?.size}]\nerror: [${it.message}]")
             when {
                 it.status == Status.LOADING -> {
                     showProgressBar()
@@ -108,29 +107,12 @@ class FlickrSearchFragment : Fragment(), Injectable {
         })
     }
 
-    override fun onPause() {
-        super.onPause()
-        AppPreference.saveKeyword(requireContext(), keyword)
-    }
-
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        keyword = AppPreference.getKeyword(requireContext()) ?: keywords.first()
-        initKeywordRecyclerView()
         initPhotoAdapter()
-    }
-
-    private fun initKeywordRecyclerView() {
-        keywordAdapter = KeywordAdapter(appExecutors) {
-            keyword = it
-            searchNavigator?.updateToolbarTitle(keyword)
-            viewModel.search(it)
+        swipeRefresh.setOnRefreshListener {
+            viewModel.refresh()
         }
-        keywordRecyclerView.apply {
-            adapter = keywordAdapter
-            layoutManager = LinearLayoutManager(requireContext(), RecyclerView.HORIZONTAL, false)
-        }
-        keywordAdapter.submitList(keywords)
     }
 
     private fun initPhotoAdapter() {
@@ -156,17 +138,21 @@ class FlickrSearchFragment : Fragment(), Injectable {
                 }
             }
         })
-        viewModel.search(keyword)
-        searchNavigator?.updateToolbarTitle(keyword)
+        search(keyword)
+    }
+
+    fun search(keyword: String?) {
+        viewModel.search(keyword ?: "")
     }
 
     private fun hideProgressBar() {
+        swipeRefresh.isRefreshing = false
     }
 
     private fun showProgressBar() {
     }
 
     private fun navigateDetail(photoBinding: PhotoItemBinding, photo: Photo) {
-        searchNavigator?.navigateDetail(keyword, photoBinding, photo)
+        searchNavigator?.navigateDetail(photoBinding, photo)
     }
 }
