@@ -91,7 +91,6 @@ dependencies {
     implementation deps.kotlin.coroutines_core
     implementation deps.kotlin.coroutines_android
 
-    implementation "org.jsoup:jsoup:1.11.3"
     implementation deps.core_ktx
     kapt deps.dagger.android_support_compiler
     kapt deps.dagger.compiler

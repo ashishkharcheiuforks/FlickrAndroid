@@ -108,7 +108,6 @@ class FlickrSearchFragment : Fragment(), Injectable {
             }
         })
         viewModel.loadMoreState.observe(this, Observer {
-            println("!!!!!!!!!!!!! loadMore $it")
         })
     }
 
