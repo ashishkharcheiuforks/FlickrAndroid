@@ -14,12 +14,3 @@
 * Robolectric
 * Leakcanary
 * Glide
-
-## Release Build
-`keystore.properties` root 위치에 파일 생성 후 아래 내용을 추가한다.
-```html
-storePassword=test123
-keyPassword=test123
-keyAlias=flcikr
-storeFile=../flickr.keystore
-``` 
