@@ -3,9 +3,9 @@ package com.hucet.flickr
 import android.app.Activity
 import android.app.Application
 import android.os.StrictMode
-import android.os.StrictMode.VmPolicy
 import com.hucet.flickr.debug.OptionalTree
 import com.hucet.flickr.di.AppInjector
+import com.hucet.flickr.glide.GlideApp
 import com.squareup.leakcanary.LeakCanary
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
@@ -21,7 +21,6 @@ open class MyApplication : Application(), HasActivityInjector {
         initTimber()
         initLeakCanary()
     }
-
     open fun initStrictMode() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(

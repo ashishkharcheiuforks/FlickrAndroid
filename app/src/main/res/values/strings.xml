@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Flickr</string>
+    <string name="flickr_transition_name">flickr_transition_name</string>
+    <string name="prefix_search_toolbar_title">Flickr Search: %1$s</string>
 </resources>
