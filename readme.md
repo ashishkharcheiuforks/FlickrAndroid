@@ -83,6 +83,7 @@ Test Codes:
 #### FlickrDatabase
 
 [FlickrDatabase](/app/src/main/java/com/hucet/flickr/db/FlickrDatabase.kt) Local Db 입니다. 
+
 [FlickrDao](/app/src/main/java/com/hucet/flickr/db/dao/FlickrDao.kt)
 
 ##### Scheme
